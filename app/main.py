@@ -135,7 +135,7 @@ ABOUT_STORY = [
 BLOG_POSTS = []
 
 SOCIAL_LINKS = [
-    {"label": "GitHub", "url": "https://github.com/FAKE-SURYA"},
+    {"label": "GitHub", "url": "https://github.com/surya-pratap-singh-dev"},
     {"label": "LinkedIn", "url": "https://www.linkedin.com/in/surya-pratap-singh-11490332a/"},
 ]
 
