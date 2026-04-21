@@ -11,7 +11,7 @@ python uvicorn app.main:app --reload
 
 Open `http://127.0.0.1:8000`.
 
-## What is included
+## What is included  ;
 
 - Hero section with animated intro + tagline
 - Featured projects with demo/source links, tech stack, and impact
