@@ -97,7 +97,6 @@ EXPERIENCE = [
     {
         "period": "2023 - 2026",
         "role": "B.Tech in Computer Science Engineering",
-        
         "highlights": [
             "Focused on backend development and cloud-oriented web application workflows.",
             "Built practical projects using Python, Node.js, APIs, authentication, and databases.",
@@ -107,21 +106,20 @@ EXPERIENCE = [
     {
         "period": "2024 - Present",
         "role": "Independent Project Developer",
-        "org": "Portfolio and real-world build track",
+        "org": "Self-directed build track",
         "highlights": [
-            "Developed multiple end-to-end applications with backend-first architecture.",
-            "Implemented secure auth, CRUD flows, integrations, and cloud-backed persistence.",
-            "Published and tested live workflows, including a Streamlit fitness product.",
+            "Built 5+ end-to-end projects including AI tools, full-stack apps, and ML models.",
+            "Shipped live products with FastAPI, React, Node.js, and cloud deployments.",
+            "Contributed security improvements and bug fixes to open source repositories on GitHub.",
         ],
     },
     {
-        "period": "Current Goal",
-        "role": "Entry-Level Software Engineer",
-        "org": "Backend / Full-Stack Product Teams",
+        "period": "2025",
+        "role": "Workshops & Hackathons",
+        "org": "IIT Roorkee Cognizance × Microsoft, AVALANCHE | Adobe India Hackathon",
         "highlights": [
-            "Seeking internship and entry-level roles where I can ship user-facing features.",
-            "Interested in backend systems, API design, and cloud-enabled products.",
-            "Open to fast-learning environments with ownership and collaboration.",
+            "AI/ML workshop with Microsoft and Blockchain workshop with AVALANCHE — Cognizance IIT Roorkee 2025.",
+            "Participated in Adobe India Hackathon Round 1 (MCQ + Coding) as Team '404 NOT FOUNDERS'.",
         ],
     },
 ]

@@ -52,9 +52,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const pad = (value, length = 2) => String(value).padStart(length, "0");
 
     const setClock = () => {
-        if (!runtimeClock) {
-            return;
-        }
+        if (!runtimeClock) return;
         const now = new Date();
         const frame = Math.floor((performance.now() % 1000) / 10);
         runtimeClock.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}:${pad(frame)}`;
@@ -77,7 +75,6 @@ window.addEventListener("DOMContentLoaded", () => {
         if (statusValue) {
             statusValue.textContent = section?.dataset.sectionLabel || "Intro";
         }
-
         navLinks.forEach((link) => {
             const href = link.getAttribute("href");
             link.classList.toggle("is-active", href === `#${section.id}`);
@@ -107,35 +104,55 @@ window.addEventListener("DOMContentLoaded", () => {
         setActiveSection(sectionAnchors[0]);
     }
 
+    // ─── GSAP guard ───────────────────────────────────────────────────────────
     if (!window.gsap || !window.ScrollTrigger || reducedMotion) {
+        // Make everything visible so page isn't blank on failure
+        document.querySelectorAll(".reveal, .intro-item").forEach((el) => {
+            el.style.opacity = "1";
+            el.style.transform = "none";
+        });
         root.classList.add("reduced-motion");
         return;
     }
 
     gsap.registerPlugin(ScrollTrigger);
+
+    // FIX 1: normalize scroll for consistent mobile behavior
     ScrollTrigger.config({ ignoreMobileResize: true });
+    if (isMobile) {
+        ScrollTrigger.normalizeScroll(true);
+    }
 
+    // ─── Intro animation ──────────────────────────────────────────────────────
     gsap.timeline({ defaults: { ease: "power2.out" } })
-        .to(".top-nav", { opacity: 1, y: 0, duration: 0.4 })
-        .to(".corner-readout", { opacity: 1, y: 0, duration: 0.3 }, "-=0.2")
-        .to(".section-status", { opacity: 1, y: 0, duration: 0.3 }, "-=0.2")
-        .to(".intro-item", { opacity: 1, y: 0, duration: 0.5, stagger: 0.07 }, "-=0.1");
+        .fromTo(".top-nav",        { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.4 })
+        .fromTo(".corner-readout", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, "-=0.2")
+        .fromTo(".section-status", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, "-=0.2")
+        .fromTo(".intro-item",     { opacity: 0, y: 24  }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.07 }, "-=0.1");
 
-    const revealStart = isMobile ? "top 92%" : "top 84%";
+    // ─── Reveal animations (FIX 2: fromTo + once + looser mobile trigger) ────
+    const revealStart = isMobile ? "top 98%" : "top 84%";
+
     gsap.utils.toArray(".reveal").forEach((element, index) => {
-        gsap.to(element, {
-            opacity: 1,
-            y: 0,
-            duration: 0.55,
-            ease: "power2.out",
-            delay: Math.min(index * 0.01, 0.08),
-            scrollTrigger: {
-                trigger: element,
-                start: revealStart,
-            },
-        });
+        gsap.fromTo(
+            element,
+            { opacity: 0, y: 30 },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 0.55,
+                ease: "power2.out",
+                delay: Math.min(index * 0.01, 0.08),
+                scrollTrigger: {
+                    trigger: element,
+                    start: revealStart,
+                    once: true,
+                },
+            }
+        );
     });
 
+    // ─── Ticker ───────────────────────────────────────────────────────────────
     const tickerTrack = document.querySelector(".ticker-track");
     if (tickerTrack) {
         gsap.to(tickerTrack, {
@@ -146,6 +163,7 @@ window.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // ─── Scroll progress meter ────────────────────────────────────────────────
     gsap.to(".scroll-meter-fill", {
         width: "100%",
         ease: "none",
@@ -157,6 +175,7 @@ window.addEventListener("DOMContentLoaded", () => {
         },
     });
 
+    // ─── Edge signal ──────────────────────────────────────────────────────────
     gsap.to(".edge-signal-core", {
         y: () => Math.max(0, window.innerHeight - 92),
         ease: "none",
@@ -168,6 +187,7 @@ window.addEventListener("DOMContentLoaded", () => {
         },
     });
 
+    // ─── Project stack (desktop only) ─────────────────────────────────────────
     const projectCards = gsap.utils.toArray("[data-stack-card]");
     const projectStack = document.querySelector(".project-stack");
     const projectWrap = document.querySelector(".project-stack-wrap");
@@ -182,7 +202,7 @@ window.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    if (projectStack && projectWrap && projectCards.length > 1 && window.innerWidth > 900) {
+    if (projectStack && projectWrap && projectCards.length > 1 && !isMobile) {
         const travel = 110;
         const stackTimeline = gsap.timeline({
             scrollTrigger: {
@@ -196,37 +216,37 @@ window.addEventListener("DOMContentLoaded", () => {
         });
 
         projectCards.forEach((card, index) => {
-            if (index === projectCards.length - 1) {
-                return;
-            }
+            if (index === projectCards.length - 1) return;
 
             stackTimeline
-                .to(
-                    card,
-                    {
-                        y: -travel,
-                        opacity: 0.12,
-                        duration: 1,
-                        ease: "none",
-                    },
-                    index,
-                )
-                .to(
-                    projectCards[index + 1],
-                    {
-                        y: 0,
-                        scale: 1,
-                        duration: 1,
-                        ease: "none",
-                    },
-                    index,
-                );
+                .to(card, { y: -travel, opacity: 0.12, duration: 1, ease: "none" }, index)
+                .to(projectCards[index + 1], { y: 0, scale: 1, duration: 1, ease: "none" }, index);
         });
+    } else if (isMobile && projectCards.length > 0) {
+        // FIX 3: on mobile just fade cards in normally, no pinning
+        gsap.fromTo(
+            projectCards,
+            { opacity: 0, y: 24 },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 0.5,
+                stagger: 0.1,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: projectWrap,
+                    start: "top 95%",
+                    once: true,
+                },
+            }
+        );
     }
 
+    // ─── Blog rail ────────────────────────────────────────────────────────────
     const blogRail = document.querySelector("[data-blog-rail]");
     const blogTrack = document.querySelector("[data-blog-track]");
     const blogCards = gsap.utils.toArray(".blog-card");
+
     if (blogRail && blogTrack && blogCards.length) {
         const getBlogDistance = () => Math.max(0, blogTrack.scrollWidth - blogRail.clientWidth);
 
@@ -247,14 +267,14 @@ window.addEventListener("DOMContentLoaded", () => {
             },
         );
 
-        if (getBlogDistance() > 0) {
+        if (!isMobile && getBlogDistance() > 0) {
             gsap.to(blogTrack, {
                 x: () => -getBlogDistance(),
                 ease: "none",
                 scrollTrigger: {
                     trigger: "#blog",
-                    start: isMobile ? "top 12%" : "top 14%",
-                    end: () => `+=${getBlogDistance() + window.innerHeight * (isMobile ? 0.85 : 0.45)}`,
+                    start: "top 14%",
+                    end: () => `+=${getBlogDistance() + window.innerHeight * 0.45}`,
                     scrub: 0.8,
                     pin: blogRail,
                     anticipatePin: 1,
@@ -264,6 +284,7 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // ─── Profile cards ────────────────────────────────────────────────────────
     const profileCards = gsap.utils.toArray(".profile-card");
     if (profileCards.length) {
         gsap.fromTo(
@@ -277,12 +298,14 @@ window.addEventListener("DOMContentLoaded", () => {
                 stagger: 0.12,
                 scrollTrigger: {
                     trigger: "#profile-intel",
-                    start: isMobile ? "top 86%" : "top 76%",
+                    start: isMobile ? "top 90%" : "top 76%",
+                    once: true,
                 },
             },
         );
     }
 
+    // ─── Magnetic buttons (desktop only) ──────────────────────────────────────
     if (pointerFine && !reducedMotion) {
         const magnets = Array.from(document.querySelectorAll(".magnetic"));
         magnets.forEach((target) => {
@@ -290,25 +313,15 @@ window.addEventListener("DOMContentLoaded", () => {
                 const bounds = target.getBoundingClientRect();
                 const x = (event.clientX - bounds.left - bounds.width / 2) * 0.12;
                 const y = (event.clientY - bounds.top - bounds.height / 2) * 0.18;
-                gsap.to(target, {
-                    x,
-                    y,
-                    duration: 0.25,
-                    ease: "power2.out",
-                });
+                gsap.to(target, { x, y, duration: 0.25, ease: "power2.out" });
             });
-
             target.addEventListener("pointerleave", () => {
-                gsap.to(target, {
-                    x: 0,
-                    y: 0,
-                    duration: 0.28,
-                    ease: "power2.out",
-                });
+                gsap.to(target, { x: 0, y: 0, duration: 0.28, ease: "power2.out" });
             });
         });
     }
 
+    // ─── Custom cursor (desktop only) ─────────────────────────────────────────
     if (pointerFine && cursorShell) {
         body.classList.add("has-custom-cursor");
         gsap.set(cursorShell, { autoAlpha: 1 });
@@ -325,24 +338,18 @@ window.addEventListener("DOMContentLoaded", () => {
         hoverTargets.forEach((target) => {
             target.addEventListener("mouseenter", () => {
                 cursorShell.classList.add("is-link");
-                if (pointerLabel) {
-                    pointerLabel.textContent = "OPEN";
-                }
+                if (pointerLabel) pointerLabel.textContent = "OPEN";
             });
             target.addEventListener("mouseleave", () => {
                 cursorShell.classList.remove("is-link");
-                if (pointerLabel) {
-                    pointerLabel.textContent = "TRACK";
-                }
+                if (pointerLabel) pointerLabel.textContent = "TRACK";
             });
         });
 
         const scanTargets = document.querySelectorAll(".subject-photo, .profile-card, .project-card");
         scanTargets.forEach((target) => {
             target.addEventListener("mouseenter", () => {
-                if (pointerLabel) {
-                    pointerLabel.textContent = "SCAN";
-                }
+                if (pointerLabel) pointerLabel.textContent = "SCAN";
             });
             target.addEventListener("mouseleave", () => {
                 if (pointerLabel && !cursorShell.classList.contains("is-link")) {
@@ -352,15 +359,17 @@ window.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // ─── ScrollTrigger refresh (FIX 4: delayed load refresh for mobile) ───────
     let refreshTimer;
     const refreshScroll = () => {
         window.clearTimeout(refreshTimer);
-        refreshTimer = window.setTimeout(() => {
-            ScrollTrigger.refresh();
-        }, 220);
+        refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 220);
     };
 
     window.addEventListener("resize", refreshScroll);
     window.addEventListener("orientationchange", refreshScroll);
-    window.addEventListener("load", refreshScroll);
+
+    window.addEventListener("load", () => {
+        setTimeout(() => ScrollTrigger.refresh(), 500);
+    });
 });
