@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ owner.name }} | Portfolio</title>
+    <meta name="description" content="Portfolio of {{ owner.name }}, {{ owner.title }}">
+    <script>
+        document.documentElement.classList.add("js");
+        (function () {
+            try {
+                const savedTheme = localStorage.getItem("portfolio-theme-v2");
+                if (savedTheme === "light") {
+                    document.documentElement.classList.add("theme-light");
+                }
+            } catch (error) {
+                /* Ignore storage errors and keep dark default */
+            }
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+</head>
+<body>
+    <div class="noise-layer" aria-hidden="true"></div>
+    <div class="scanline-layer" aria-hidden="true"></div>
+    <div class="scroll-meter" aria-hidden="true"><span class="scroll-meter-fill"></span></div>
+    <div class="edge-signal" aria-hidden="true"><span class="edge-signal-core"></span></div>
+    <div class="corner-readout" aria-hidden="true">
+        <span class="hud-small">{{ owner.location }}</span>
+        <span class="hud-small" data-runtime-clock>00:00:00:00</span>
+        <span class="hud-small" data-coordinates>X:000 Y:000</span>
+    </div>
+    <div class="cursor-shell" aria-hidden="true">
+        <span class="cursor-ring"></span>
+        <span class="cursor-dot"></span>
+        <span class="cursor-label" data-pointer-label>TRACK</span>
+    </div>
+
+    <header class="top-nav">
+        <a href="#hero" class="brand-lockup">PORTFOLIO</a>
+        <nav aria-label="Primary">
+            <ul>
+                <li><a href="#projects" class="nav-link">Projects</a></li>
+                <li><a href="#profile-intel" class="nav-link">Profile</a></li>
+                <li><a href="#experience" class="nav-link">Experience</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                {% if blog_posts %}
+                <li><a href="#blog" class="nav-link">Blog</a></li>
+                {% endif %}
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+        </nav>
+        <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle color mode" aria-pressed="false">
+            <span class="signal-dot"></span>
+            <span class="theme-toggle-label">DAY MODE</span>
+        </button>
+    </header>
+
+    <div class="section-status" aria-hidden="true">
+        <span class="section-status-label">SECTOR</span>
+        <span class="section-status-value" data-active-section>Intro</span>
+    </div>
+
+    <main>
+        <section id="hero" class="scene hero section-anchor" data-section-label="Intro">
+            <div class="hero-grid-lines" aria-hidden="true"></div>
+            <p class="status-chip intro-item">TOP SECRET // CASE #2026</p>
+            <h1 class="hero-name intro-item">
+                <span>{{ owner.name.split(' ')[0] if owner.name.split(' ')|length > 0 else 'YOUR' }}</span>
+                <span>{{ owner.name.split(' ')[1:]|join(' ') if owner.name.split(' ')|length > 1 else 'NAME' }}</span>
+            </h1>
+            <p class="hero-lead intro-item">{{ owner.title }}</p>
+            <p class="hero-sub intro-item">{{ owner.tagline }}</p>
+
+            <div class="hero-cta-row intro-item">
+                <a href="#contact" class="btn btn-primary magnetic">Let's build something</a>
+                <a href="#projects" class="btn btn-ghost magnetic">Open evidence board</a>
+            </div>
+
+            <article class="floating-card floating-card-a intro-item" aria-hidden="true">
+                <p>LAT: 48.8566 N</p>
+                <p>LON: 2.3522 E</p>
+                <p>SECURE_GRID_99</p>
+            </article>
+
+            <article class="floating-card floating-card-b intro-item" aria-hidden="true">
+                <p>&gt;&gt; analyzing logic...</p>
+                <p>&gt;&gt; bug eliminated</p>
+                <p>&gt;&gt; system optimized</p>
+            </article>
+
+            <article class="floating-card floating-card-c intro-item" aria-hidden="true">
+                <p>BUILD MODE</p>
+                <p class="accent-text">LIVE SYSTEM</p>
+                <p>TRACKING ENABLED</p>
+            </article>
+        </section>
+
+        <section class="scene ticker-scene reveal" aria-hidden="true">
+            <div class="ticker-wrap">
+                <div class="ticker-track">
+                    <span>FULLSTACK OPERATOR</span>
+                    <span>BACKEND RIGOR</span>
+                    <span>FRONTEND INTERACTIVITY</span>
+                    <span>CINEMATIC SCROLL SYSTEMS</span>
+                    <span>LIVE PRODUCT IMPACT</span>
+                    <span>FULLSTACK OPERATOR</span>
+                    <span>BACKEND RIGOR</span>
+                    <span>FRONTEND INTERACTIVITY</span>
+                    <span>CINEMATIC SCROLL SYSTEMS</span>
+                    <span>LIVE PRODUCT IMPACT</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="scene projects scene-pad section-anchor" data-section-label="Projects">
+            <div class="scene-head reveal">
+                <p class="scene-eyebrow">Evidence Board</p>
+                <h2>Project dossiers presented as a stacked investigation.</h2>
+            </div>
+            <div class="project-stack-wrap">
+                <div class="project-stack">
+                    {% for project in projects %}
+                    <article class="project-card" data-stack-card>
+                        <p class="project-index">FILE 0{{ loop.index }}</p>
+                        <h3>{{ project.name }}</h3>
+                        <p class="project-description">{{ project.description }}</p>
+                        <div class="project-techs">
+                            {% for tech in project.tech %}
+                            <span>{{ tech }}</span>
+                            {% endfor %}
+                        </div>
+                        <p class="project-impact">Impact: {{ project.impact }}</p>
+                        <div class="project-links">
+                            {% if project.demo_url %}
+                            <a href="{{ project.demo_url }}" target="_blank" rel="noreferrer" class="magnetic">Live demo</a>
+                            {% endif %}
+                            {% if project.repo_url %}
+                            <a href="{{ project.repo_url }}" target="_blank" rel="noreferrer" class="magnetic">Source</a>
+                            {% endif %}
+                            {% if not project.demo_url and not project.repo_url %}
+                            <span class="project-meta-note">Code and demo available on request.</span>
+                            {% endif %}
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <section id="profile-intel" class="scene scene-pad section-anchor" data-section-label="Subject">
+            <div class="subject-head reveal">
+                <h2>Subject Profile</h2>
+                <p class="subject-case">CASE FILE {{ profile_record.case_id }} // STATUS: {{ profile_record.status }}</p>
+            </div>
+
+            <div class="profile-grid">
+                <article class="profile-card profile-card-subject reveal">
+                    <h3>{{ owner.name }}</h3>
+                    <div class="subject-photo" aria-hidden="true">
+                        <span class="subject-initials">
+                            {{ owner.name.split(' ')[0][0] if owner.name.split(' ')|length > 0 else 'Y' }}
+                            {{ owner.name.split(' ')[-1][0] if owner.name.split(' ')|length > 1 else 'N' }}
+                        </span>
+                        <span class="subject-scan subject-scan-a"></span>
+                        <span class="subject-scan subject-scan-b"></span>
+                    </div>
+                    <div class="subject-meta-grid">
+                        <p><span>CLASS</span><span>{{ profile_record.class_code }}</span></p>
+                        <p><span>XP_LEVEL</span><span>{{ profile_record.xp_level }}</span></p>
+                    </div>
+                    <div class="subject-lang-grid">
+                        {% for item in profile_record.languages %}
+                        <p><span>{{ item.label }}</span><span>{{ item.value }}</span></p>
+                        {% endfor %}
+                    </div>
+                    <div class="subject-availability">
+                        <p class="subject-availability-label">SYSTEM_ALERT</p>
+                        <p class="subject-availability-title">{{ profile_record.availability }}</p>
+                        <div class="subject-availability-meta">
+                            <span>// CONTRACTS: ENABLED</span>
+                            <span>[REMOTE_READY]</span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="profile-card profile-card-report reveal">
+                    <div class="report-head">
+                        <p>COMPETENCE_ANALYSIS_REPORT</p>
+                        <p>[READ_ONLY]</p>
+                    </div>
+                    <p class="report-lead">
+                        Hybrid developer obsessed with the fusion of
+                        <span>technical rigor</span> and
+                        <span>visual impact</span>.
+                        I build fast products with clear architecture and memorable interaction layers.
+                    </p>
+                    <div class="report-block">
+                        <p class="report-label">// ACADEMIC_LOG [EDUCATION]</p>
+                        {% for item in profile_record.education %}
+                        <p class="report-row">
+                            <span>{{ item.label }}</span>
+                            <span>{{ item.period }}</span>
+                        </p>
+                        <p class="report-detail">{{ item.detail }}</p>
+                        {% endfor %}
+                    </div>
+                    <div class="report-block">
+                        <p class="report-label">// FIELD_OPERATIONS [CURRENT FOCUS]</p>
+                        <p class="report-detail">Designing robust backends, interactive frontends, and high-velocity product workflows.</p>
+                    </div>
+                </article>
+
+                <article class="profile-card profile-card-inventory reveal">
+                    <p class="inventory-title">EQUIPMENT_INVENTORY</p>
+                    <p class="inventory-subtitle">HARD SKILLS</p>
+                    <div class="inventory-tags">
+                        {% for skill in profile_hard_skills %}
+                        <span>{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                    <p class="inventory-subtitle">SOFT SIGNALS</p>
+                    <div class="inventory-tags inventory-tags-soft">
+                        {% for trait in profile_record.soft_skills %}
+                        <span>{{ trait }}</span>
+                        {% endfor %}
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section id="experience" class="scene scene-pad section-anchor" data-section-label="Experience">
+            <div class="scene-head reveal">
+                <p class="scene-eyebrow">Field Log</p>
+                <h2>Internships, hackathons, and mission outcomes.</h2>
+            </div>
+            <div class="timeline">
+                {% for item in experience_items %}
+                <article class="timeline-entry reveal">
+                    <p class="timeline-period">{{ item.period }}</p>
+                    <h3>{{ item.role }}</h3>
+                    <p class="timeline-org">{{ item.org }}</p>
+                    <ul>
+                        {% for bullet in item.highlights %}
+                        <li>{{ bullet }}</li>
+                        {% endfor %}
+                    </ul>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="about" class="scene scene-pad section-anchor" data-section-label="About">
+            <div class="scene-head reveal">
+                <p class="scene-eyebrow">Profile</p>
+                <h2>Short story, zero fluff.</h2>
+            </div>
+            <article class="about-panel reveal">
+                {% for line in about_story %}
+                <p>{{ line }}</p>
+                {% endfor %}
+            </article>
+        </section>
+
+        {% if blog_posts %}
+        <section id="blog" class="scene scene-pad blog-scene section-anchor" data-section-label="Lessons">
+            <div class="scene-head reveal">
+                <p class="scene-eyebrow">Learning Logs</p>
+                <h2>What I learned from building these projects.</h2>
+            </div>
+            <div class="blog-rail" data-blog-rail>
+                <div class="blog-grid" data-blog-track>
+                    {% for post in blog_posts %}
+                    <article class="blog-card">
+                        <p class="blog-read">{{ post.read_time }}</p>
+                        <h3>{{ post.title }}</h3>
+                        <p>{{ post.excerpt }}</p>
+                        <a href="{{ post.url }}" target="_blank" rel="noreferrer" class="magnetic">Read article</a>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <section id="contact" class="scene scene-pad section-anchor" data-section-label="Contact">
+            <article class="contact-panel reveal">
+                <p class="scene-eyebrow">Open Channel</p>
+                <h2>Let's build something unforgettable.</h2>
+                <p class="contact-sub">If you have a product, internship, or wild concept, I'm in.</p>
+                <div class="contact-actions">
+                    <a href="mailto:{{ owner.email }}" class="btn btn-primary magnetic">Send email</a>
+                    {% if owner.phone %}
+                    <a href="tel:{{ owner.phone }}" class="btn btn-ghost magnetic"></a>
+                    {% endif %}
+                    {% for social in social_links %}
+                    <a href="{{ social.url }}" target="_blank" rel="noreferrer" class="btn btn-ghost magnetic">{{ social.label }}</a>
+                    {% endfor %}
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>© {{ year }} {{ owner.name }} // FastAPI + GSAP + ScrollTrigger</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="{{ url_for('static', path='/js/main.js') }}" defer></script>
+</body>
+</html>
