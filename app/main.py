@@ -6,6 +6,13 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 app = FastAPI(title="Crazy Portfolio")
+
+@app.middleware("http")
+async def fix_https(request: Request, call_next):
+    request.scope["scheme"] = "https"
+    response = await call_next(request)
+    return response
+
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
@@ -15,7 +22,6 @@ OWNER = {
     "tagline": "Final-year BTech CSE student focused on backend and cloud-based web applications.",
     "location": "Kanpur, Uttar Pradesh, India",
     "email": "suryapratapsingh7054039@gmail.com",
-    
 }
 
 PROJECTS = [
@@ -182,8 +188,6 @@ PROFILE_RECORD = {
         {
             "label": "B.Tech Computer Science Engineering",
             "period": "2023 - 2026",
-            
-            
         },
         {
             "label": "Current Focus",
