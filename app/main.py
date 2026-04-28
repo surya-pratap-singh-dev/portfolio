@@ -54,7 +54,7 @@ PROJECTS = [
         "description": "Built an application to analyze resumes and suggest job roles using keyword matching.",
         "tech": ["Python", "Text Processing", "Keyword Matching"],
         "impact": "Automated resume-to-role recommendation workflow.",
-        "demo_url": None,
+        "demo_url": "https://smartrecruitai-app.onrender.com/",
         "repo_url": "https://github.com/surya-pratap-singh-dev/smartrecruitai_app",
     },
     {
