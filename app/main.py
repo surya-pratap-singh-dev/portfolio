@@ -19,7 +19,7 @@ templates = Jinja2Templates(directory="app/templates")
 OWNER = {
     "name": "Surya Pratap Singh",
     "title": "I build scalable backend systems and AI-powered applications",
-    "tagline": "Final-year BTech CSE student focused on backend and cloud-based web applications.",
+    "tagline": "Backend Engineer | Building scalable web apps & AI tools",
     "location": "Kanpur, Uttar Pradesh, India",
     "email": "suryapratapsingh7054039@gmail.com",
 }
@@ -176,7 +176,7 @@ SOCIAL_LINKS = [
 
 PROFILE_RECORD = {
     "case_id": "SPS-2026-IN",
-    "status": "Final-year BTech CSE student seeking entry-level software roles",
+    "status": "Backend Engineer | Shipping scalable apps with Python Fast API & Node.js",
     "class_code": "BTECH_CSE",
     "xp_level": "BACKEND",
     "availability": "OPEN TO WORK",
