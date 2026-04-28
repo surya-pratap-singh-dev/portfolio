@@ -39,7 +39,7 @@ PROJECTS = [
         "tech": ["Python", "PyTorch", "Streamlit", "Machine Learning", "GANs"],
         "impact": "Generated 10,000+ realistic transactions maintaining fraud distribution (~3%) for ML model training without exposing sensitive data.",
         "demo_url": "https://cgansynthetic-data-generator-6byxvzuiph4ewfvodtc92i.streamlit.app/",
-        "repo_url": "https://github.com/FAKE-SURYA/cgan_synthetic-data-generator"
+        "repo_url": "https://github.com/surya-pratap-singh-dev/cgan_synthetic-data-generator"
     },
     {
         "name": "IronMind Habit and Fitness Tracker",
@@ -147,7 +147,7 @@ BLOG_POSTS = [
         "read_time": "5 MIN READ",
         "title": "CGAN Project: Data Quality Beats Fancy Models",
         "excerpt": "Most gains came from data prep and evaluation discipline. Balancing fraud classes and validating generated patterns mattered more than architecture tweaks.",
-        "url": "https://github.com/FAKE-SURYA/cgan_synthetic-data-generator",
+        "url": "https://github.com/surya-pratap-singh-dev/cgan_synthetic-data-generator",
     },
     {
         "read_time": "3 MIN READ",
@@ -170,7 +170,7 @@ BLOG_POSTS = [
 ]
 
 SOCIAL_LINKS = [
-    {"label": "GitHub", "url": "https://github.com/FAKE-SURYA"},
+    {"label": "GitHub", "url": "https://github.com/surya-pratap-singh-dev"},
     {"label": "LinkedIn", "url": "https://www.linkedin.com/in/surya-pratap-singh-11490332a/"},
 ]
 
