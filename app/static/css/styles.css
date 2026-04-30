@@ -43,7 +43,6 @@ body {
     margin: 0;
     padding: 0;
     overflow-x: clip;
-    scroll-behavior: smooth;
 }
 
 body {
@@ -830,27 +829,178 @@ main {
     border-color: rgba(255, 46, 46, 0.42);
 }
 
-.project-stack-wrap {
-    margin-top: 2.2rem;
-    min-height: 78vh;
+/* ─── Project Controls ─────────────────────────────────────────────────── */
+.project-controls {
+    margin-top: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.view-toggle {
+    display: flex;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.view-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: color 180ms ease, background 180ms ease;
+}
+
+.view-btn.is-active {
+    color: var(--accent);
+    background: rgba(255, 46, 46, 0.12);
+}
+
+.view-btn:hover:not(.is-active) {
+    color: var(--text-soft);
+}
+
+.slider-arrows {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.arrow-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--panel-hard) 88%, transparent);
+    color: var(--text-soft);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: border-color 180ms ease, color 180ms ease;
+}
+
+.arrow-btn:hover {
+    border-color: var(--accent);
+    color: var(--text);
+}
+
+/* ─── Project Slider ──────────────────────────────────────────────────── */
+.project-slider-wrap {
+    margin-top: 1.2rem;
+    overflow: hidden;
     position: relative;
 }
 
-.project-stack {
-    position: relative;
-    height: 68vh;
+.project-slider-track {
+    display: flex;
+    gap: 1rem;
+    will-change: transform;
 }
 
-.project-card {
-    position: absolute;
-    inset: 0;
+.project-slide {
+    flex: 0 0 clamp(280px, 28vw, 360px);
+    min-height: 520px;
     border: 1px solid var(--line);
     background: linear-gradient(145deg, color-mix(in srgb, var(--panel-hard) 91%, transparent), color-mix(in srgb, var(--panel-hard) 72%, transparent));
     box-shadow: var(--shadow);
-    padding: clamp(1.2rem, 2.1vw, 1.8rem);
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
+    transition: border-color 300ms ease;
+}
+
+.project-slide:hover {
+    border-color: var(--line-strong);
+}
+
+.project-slide-visual {
+    position: relative;
+    height: 180px;
+    background:
+        radial-gradient(circle at 30% 40%, rgba(255, 46, 46, 0.15), transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(108, 238, 255, 0.08), transparent 40%),
+        color-mix(in srgb, var(--panel-hard) 96%, black);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+}
+
+.project-slide-visual::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.04) 0 1px,
+        transparent 1px 5px
+    );
+    opacity: 0.5;
+}
+
+.project-slide-visual::after {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    border: 1px solid rgba(255, 46, 46, 0.3);
+    pointer-events: none;
+}
+
+.slide-number {
+    position: relative;
+    z-index: 2;
+    font-family: "Cormorant Garamond", serif;
+    font-size: 4.5rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.08);
+    letter-spacing: 0.05em;
+}
+
+.slide-tag {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    color: var(--accent-soft);
+    writing-mode: vertical-rl;
+}
+
+.slide-dots {
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    display: grid;
+    grid-template-columns: repeat(3, 5px);
+    gap: 3px;
+}
+
+.slide-dots::before,
+.slide-dots::after {
+    content: "";
+    width: 5px;
+    height: 5px;
+    background: var(--accent);
+    border-radius: 1px;
+}
+
+.slide-dots::before { box-shadow: 8px 0 0 var(--accent), 16px 0 0 var(--accent); }
+
+.project-slide-body {
+    padding: clamp(0.9rem, 1.5vw, 1.3rem);
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    flex: 1;
 }
 
 .project-index {
@@ -861,40 +1011,42 @@ main {
     font-size: 0.72rem;
 }
 
-.project-card h3 {
+.project-slide-body h3 {
     margin: 0;
-    font-size: clamp(1.55rem, 2.6vw, 2.25rem);
+    font-size: clamp(1.15rem, 1.8vw, 1.5rem);
+    line-height: 1.2;
 }
 
 .project-description {
     margin: 0;
     color: var(--text-soft);
     line-height: 1.55;
-    max-width: 74ch;
+    font-size: 0.88rem;
 }
 
 .project-techs {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.45rem;
+    gap: 0.35rem;
 }
 
 .project-techs span {
     font-family: "IBM Plex Mono", monospace;
-    font-size: 0.67rem;
+    font-size: 0.62rem;
     letter-spacing: 0.04em;
     color: var(--text-soft);
     border: 1px solid var(--line);
     background: color-mix(in srgb, var(--panel-hard) 82%, transparent);
-    padding: 0.32rem 0.56rem;
+    padding: 0.26rem 0.46rem;
 }
 
 .project-impact {
     margin: 0;
     color: var(--text-soft);
-    padding: 0.52rem 0.66rem;
+    padding: 0.42rem 0.56rem;
     border-left: 2px solid var(--accent);
     background: rgba(255, 46, 46, 0.08);
+    font-size: 0.85rem;
 }
 
 .project-links {
@@ -907,6 +1059,7 @@ main {
     text-decoration: none;
     color: var(--teal);
     font-weight: 700;
+    font-size: 0.9rem;
 }
 
 .project-links a:hover,
@@ -920,6 +1073,19 @@ main {
     letter-spacing: 0.05em;
     color: var(--text-dim);
 }
+
+/* ─── List View ───────────────────────────────────────────────────────── */
+.projects.list-view .project-slider-wrap { overflow: visible; }
+.projects.list-view .project-slider-track {
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.projects.list-view .project-slide {
+    flex: 1 1 340px;
+    min-height: 400px;
+}
+.projects.list-view .project-slide-visual { height: 120px; }
+.projects.list-view .slider-arrows { display: none; }
 
 .timeline {
     margin-top: 2rem;
@@ -1141,21 +1307,22 @@ main {
         padding-top: 130px;
     }
 
-    .project-stack-wrap {
-        min-height: 0;
+    .project-slider-wrap {
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    .project-slider-wrap::-webkit-scrollbar { display: none; }
+
+    .project-slide {
+        flex: 0 0 min(82vw, 320px);
+        scroll-snap-align: start;
+        min-height: 460px;
     }
 
-    .project-stack {
-        position: static;
-        height: auto;
-        display: grid;
-        gap: 0.9rem;
-    }
-
-    .project-card {
-        position: relative;
-        inset: auto;
-    }
+    .project-slide-visual { height: 140px; }
 
     .profile-grid {
         grid-template-columns: 1fr;
@@ -1193,6 +1360,10 @@ main {
     .footer {
         width: calc(100vw - 2rem);
     }
+
+    .corner-brackets { display: none; }
+    .system-logs { display: none; }
+    .track-toggle { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1213,6 +1384,7 @@ main {
         opacity: 1 !important;
         transform: none !important;
     }
+    .preloader { display: none; }
 }
 
 html.reduced-motion .reveal,
@@ -1224,23 +1396,226 @@ html.reduced-motion .corner-readout {
     transform: none !important;
 }
 
-@media (max-width: 900px) {
-    .reveal {
-        animation: fadeUp 0.6s ease forwards;
-    }
-
-    .intro-item {
-        animation: fadeUp 0.5s ease forwards;
-    }
-
-    @keyframes fadeUp {
-        from {
-            opacity: 0;
-            transform: translateY(24px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+/* ─── Preloader ───────────────────────────────────────────────────────── */
+.preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background:
+        radial-gradient(circle at 50% 30%, rgba(255, 46, 46, 0.08), transparent 50%),
+        var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    transition: clip-path 0.9s cubic-bezier(0.65, 0, 0.35, 1),
+                opacity 0.6s ease 0.2s;
+    clip-path: inset(0 0 0 0);
 }
+
+.preloader.is-done {
+    clip-path: inset(0 0 100% 0);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.preloader-brand {
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(3rem, 10vw, 5.5rem);
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--text);
+    text-shadow: 0 0 40px rgba(255, 46, 46, 0.2);
+}
+
+.preloader-signal {
+    width: min(260px, 60vw);
+    height: 2px;
+    background: rgba(255, 46, 46, 0.12);
+    position: relative;
+    overflow: hidden;
+    border-radius: 2px;
+}
+
+.preloader-signal::after {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: -40%;
+    width: 40%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent-soft), transparent);
+    box-shadow: 0 0 18px rgba(255, 46, 46, 0.5);
+    border-radius: 4px;
+    animation: signalTrace 1.6s ease-in-out infinite;
+}
+
+@keyframes signalTrace {
+    0% { left: -40%; }
+    100% { left: 100%; }
+}
+
+.preloader-status {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    min-height: 1.2em;
+}
+
+.preloader-counter {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.05em;
+    line-height: 1;
+}
+
+.preloader-counter span {
+    color: var(--accent);
+}
+
+/* ─── Corner Brackets ─────────────────────────────────────────────────── */
+.corner-brackets {
+    position: fixed;
+    inset: 0;
+    z-index: 130;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 400ms ease;
+}
+
+.corner-brackets.is-visible { opacity: 1; }
+
+.bracket {
+    position: fixed;
+    width: 22px;
+    height: 22px;
+}
+
+.bracket-tl { top: 10px; left: 10px; border-top: 2px solid var(--accent); border-left: 2px solid var(--accent); }
+.bracket-tr { top: 10px; right: 10px; border-top: 2px solid var(--accent); border-right: 2px solid var(--accent); }
+.bracket-bl { bottom: 10px; left: 10px; border-bottom: 2px solid var(--accent); border-left: 2px solid var(--accent); }
+.bracket-br { bottom: 10px; right: 10px; border-bottom: 2px solid var(--accent); border-right: 2px solid var(--accent); }
+
+/* ─── Track Toggle ────────────────────────────────────────────────────── */
+.track-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: rgba(255, 46, 46, 0.08);
+    color: var(--accent-soft);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    padding: 0.55rem 1rem;
+    cursor: pointer;
+    transition: background 200ms ease, box-shadow 200ms ease;
+}
+
+.track-toggle:hover {
+    background: rgba(255, 46, 46, 0.15);
+    box-shadow: 0 0 20px rgba(255, 46, 46, 0.15);
+}
+
+.track-toggle.is-active {
+    background: rgba(255, 46, 46, 0.18);
+    box-shadow: 0 0 24px rgba(255, 46, 46, 0.2);
+}
+
+.track-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--text-dim);
+    transition: background 200ms ease, box-shadow 200ms ease;
+}
+
+.track-toggle.is-active .track-dot {
+    background: var(--accent);
+    box-shadow: 0 0 8px rgba(255, 46, 46, 0.6);
+    animation: pulse 1.6s ease-in-out infinite;
+}
+
+.track-toggle-label {
+    text-transform: uppercase;
+}
+
+/* ─── System Logs ─────────────────────────────────────────────────────── */
+.system-logs {
+    position: absolute;
+    right: 0;
+    top: 360px;
+    width: min(320px, 30vw);
+    border: 1px solid var(--line);
+    background: color-mix(in srgb, var(--panel-hard) 92%, transparent);
+    backdrop-filter: blur(8px);
+    padding: 0.8rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.03em;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 400ms ease, transform 400ms ease;
+    pointer-events: none;
+    max-height: 260px;
+    overflow: hidden;
+}
+
+.system-logs.is-visible {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+.system-logs-header {
+    margin: 0 0 0.6rem;
+    color: var(--accent-soft);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.45rem;
+}
+
+.system-logs-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    color: var(--text-dim);
+    line-height: 1.55;
+}
+
+.system-logs-body .log-line {
+    opacity: 0;
+    animation: logFadeIn 0.3s ease forwards;
+}
+
+.system-logs-body .log-line.log-ok { color: var(--lime); }
+.system-logs-body .log-line.log-warn { color: var(--accent-soft); }
+
+@keyframes logFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.log-cursor {
+    display: inline-block;
+    width: 6px;
+    height: 12px;
+    background: var(--accent);
+    animation: blink 1s step-end infinite;
+    vertical-align: middle;
+    margin-left: 2px;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Mobile animation fallback removed — GSAP handles all animations */

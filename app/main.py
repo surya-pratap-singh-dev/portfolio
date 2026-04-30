@@ -9,7 +9,10 @@ app = FastAPI(title="Crazy Portfolio")
 
 @app.middleware("http")
 async def fix_https(request: Request, call_next):
-    request.scope["scheme"] = "https"
+    # Only force https when behind a proxy (production), not on localhost
+    host = request.headers.get("host", "")
+    if "localhost" not in host and "127.0.0.1" not in host:
+        request.scope["scheme"] = "https"
     response = await call_next(request)
     return response
 
