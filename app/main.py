@@ -45,6 +45,15 @@ PROJECTS = [
         "repo_url": "https://github.com/surya-pratap-singh-dev/cgan_synthetic-data-generator"
     },
     {
+    "name": "GitHub OSS Issue Notifier",
+    "description": "Backend service that monitors 20+ open source orgs in real-time and delivers hourly email digests of new GitHub issues. Fully automated — push to main triggers CI/CD pipeline, auto-deploys to AWS EC2 via Docker.",
+    "tech": ["Python", "Docker", "AWS EC2", "GitHub Actions", "CI/CD"],
+    "impact": "Zero-touch deployment pipeline running in production. Monitors 20+ OSS orgs continuously with zero manual intervention since launch.",
+    "demo_url": None,
+    "repo_url": "https://github.com/surya-pratap-singh-dev/github-oss-issue-notifier",
+    "note": "// backend service · no UI · live in production"
+    },
+    {
         "name": "IronMind Habit and Fitness Tracker",
         "description": "Built a habit tracking dashboard with streak analytics and progress visualization.",
         "tech": ["Python", "Streamlit", "Analytics"],
