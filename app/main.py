@@ -29,12 +29,12 @@ OWNER = {
 
 PROJECTS = [
     {
-        "name": "Cloud Storage Web App",
-        "description": "Built a full-stack file storage platform with authentication and cloud storage integration.",
-        "tech": ["Node.js", "Express.js", "MongoDB", "Supabase", "REST APIs", "JWT"],
-        "impact": "Implemented file upload, download, and user access control.",
-        "demo_url": None,
-        "repo_url": "https://github.com/surya-pratap-singh-dev/drive-clone",
+    "name": "GitHub OSS Issue Notifier",
+    "description": "Backend service that monitors 20+ open source orgs in real-time and delivers hourly email digests of new GitHub issues. Fully automated — push to main triggers CI/CD pipeline, auto-deploys to AWS EC2 via Docker.",
+    "tech": ["Python", "Docker", "AWS EC2", "GitHub Actions", "CI/CD"],
+    "impact": "Zero-touch deployment pipeline running in production. Monitors 20+ OSS orgs continuously with zero manual intervention since launch.",
+    "repo_url": "https://github.com/surya-pratap-singh-dev/github-oss-issue-notifier",
+    "note": "// backend service · no UI · live in production"
     },
     {
         "name": "Synthetic Financial Transaction Data Generator (CGAN)",
@@ -45,13 +45,11 @@ PROJECTS = [
         "repo_url": "https://github.com/surya-pratap-singh-dev/cgan_synthetic-data-generator"
     },
     {
-    "name": "GitHub OSS Issue Notifier",
-    "description": "Backend service that monitors 20+ open source orgs in real-time and delivers hourly email digests of new GitHub issues. Fully automated — push to main triggers CI/CD pipeline, auto-deploys to AWS EC2 via Docker.",
-    "tech": ["Python", "Docker", "AWS EC2", "GitHub Actions", "CI/CD"],
-    "impact": "Zero-touch deployment pipeline running in production. Monitors 20+ OSS orgs continuously with zero manual intervention since launch.",
-    "demo_url": None,
-    "repo_url": "https://github.com/surya-pratap-singh-dev/github-oss-issue-notifier",
-    "note": "// backend service · no UI · live in production"
+        "name": "Cloud Storage Web App",
+        "description": "Built a full-stack file storage platform with authentication and cloud storage integration.",
+        "tech": ["Node.js", "Express.js", "MongoDB", "Supabase", "REST APIs", "JWT"],
+        "impact": "Implemented file upload, download, and user access control.",
+        "repo_url": "https://github.com/surya-pratap-singh-dev/drive-clone",
     },
     {
         "name": "IronMind Habit and Fitness Tracker",
@@ -74,7 +72,6 @@ PROJECTS = [
         "description": "Built an AI-powered interview coaching app that simulates real interview scenarios by generating role-specific questions and evaluating user responses via voice input.",
         "tech": ["React", "TypeScript", "Google AI Studio (Gemini API)", "Speech-to-Text"],
         "impact": "Enabled real-time interview practice with AI-generated feedback, improving candidate readiness through interactive voice-based sessions.",
-        "demo_url": "https://your-live-demo-link",
         "repo_url": "https://github.com/surya-pratap-singh-dev/ai-interview-coach"
     }
 ]
@@ -150,6 +147,12 @@ ABOUT_STORY = [
 
 BLOG_POSTS = [
     {
+    "read_time": "5 MIN READ",
+    "title": "I Built a Bot That Watches GitHub 24/7 So I Don't Have To",
+    "excerpt": "Automated open-source issue tracking with Python, Docker, and AWS EC2. A self-hosted CI/CD pipeline that sends hourly email digests of new GitHub issues.",
+    "url": "https://medium.com/@suryabhaisince2002/i-built-a-bot-that-watches-github-24-7-so-i-dont-have-to-3258f1e62ada",
+    },
+    {
         "read_time": "4 MIN READ",
         "title": "Cloud Storage App: Auth Has To Be System-Level",
         "excerpt": "I learned that login is just step one. Real security came from permission checks on every file action and predictable token/session handling.",
@@ -159,7 +162,7 @@ BLOG_POSTS = [
         "read_time": "5 MIN READ",
         "title": "CGAN Project: Data Quality Beats Fancy Models",
         "excerpt": "Most gains came from data prep and evaluation discipline. Balancing fraud classes and validating generated patterns mattered more than architecture tweaks.",
-        "url": "https://github.com/surya-pratap-singh-dev/cgan_synthetic-data-generator",
+        "url": "https://medium.com/@suryabhaisince2002/i-built-a-gan-that-generates-fake-bank-fraud-data-heres-what-actually-happened-9ed58400c6f5",
     },
     {
         "read_time": "3 MIN READ",
@@ -184,6 +187,7 @@ BLOG_POSTS = [
 SOCIAL_LINKS = [
     {"label": "GitHub", "url": "https://github.com/surya-pratap-singh-dev"},
     {"label": "LinkedIn", "url": "https://www.linkedin.com/in/surya-pratap-singh-11490332a/"},
+    {"label": "Medium", "url": "https://medium.com/@suryabhaisince2002"},
 ]
 
 PROFILE_RECORD = {
