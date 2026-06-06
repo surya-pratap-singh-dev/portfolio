@@ -25,6 +25,7 @@ OWNER = {
     "tagline": "Backend Engineer | Building scalable web apps & AI tools",
     "location": "Kanpur, Uttar Pradesh, India",
     "email": "suryapratapsingh7054039@gmail.com",
+    "resume_url": "mailto:suryapratapsingh7054039@gmail.com?subject=Resume%20request%20-%20Surya%20Pratap%20Singh",
 }
 
 PROJECTS = [
@@ -34,7 +35,11 @@ PROJECTS = [
     "tech": ["Python", "Docker", "AWS EC2", "GitHub Actions", "CI/CD"],
     "impact": "Zero-touch deployment pipeline running in production. Monitors 20+ OSS orgs continuously with zero manual intervention since launch.",
     "repo_url": "https://github.com/surya-pratap-singh-dev/github-oss-issue-notifier",
-    "note": "// backend service · no UI · live in production"
+    "note": "// backend service · no UI · live in production",
+    "stats": ["20+ OSS orgs", "Hourly digest", "AWS EC2", "Docker CI/CD"],
+    "preview_title": "OSS WATCH NODE",
+    "preview_lines": ["GitHub API poller", "Digest queue active", "ECR image deployed", "Main branch auto-release"],
+    "preview_signal": "PROD",
     },
     {
         "name": "Synthetic Financial Transaction Data Generator (CGAN)",
@@ -42,7 +47,11 @@ PROJECTS = [
         "tech": ["Python", "PyTorch", "Streamlit", "Machine Learning", "GANs"],
         "impact": "Generated 10,000+ realistic transactions maintaining fraud distribution (~3%) for ML model training without exposing sensitive data.",
         "demo_url": "https://cgansynthetic-data-generator-6byxvzuiph4ewfvodtc92i.streamlit.app/",
-        "repo_url": "https://github.com/surya-pratap-singh-dev/cgan_synthetic-data-generator"
+        "repo_url": "https://github.com/surya-pratap-singh-dev/cgan_synthetic-data-generator",
+        "stats": ["10k+ records", "~3% fraud", "CGAN model", "Streamlit UI"],
+        "preview_title": "SYNTHETIC LEDGER",
+        "preview_lines": ["Fraud class locked", "Generator trained", "Distribution validated", "CSV export ready"],
+        "preview_signal": "ML",
     },
     {
         "name": "Cloud Storage Web App",
@@ -50,6 +59,10 @@ PROJECTS = [
         "tech": ["Node.js", "Express.js", "MongoDB", "Supabase", "REST APIs", "JWT"],
         "impact": "Implemented file upload, download, and user access control.",
         "repo_url": "https://github.com/surya-pratap-singh-dev/drive-clone",
+        "stats": ["JWT auth", "File access", "REST APIs", "Supabase"],
+        "preview_title": "STORAGE VAULT",
+        "preview_lines": ["Token gate verified", "Upload route online", "Access policy checked", "MongoDB session map"],
+        "preview_signal": "AUTH",
     },
     {
         "name": "IronMind Habit and Fitness Tracker",
@@ -58,6 +71,10 @@ PROJECTS = [
         "impact": "Shipped as a live app with interactive progress views.",
         "demo_url": "https://iron-mind-project-hdecbpjkwcurbtae7fmue5.streamlit.app/",
         "repo_url": "https://github.com/surya-pratap-singh-dev/iron-mind-project",
+        "stats": ["Live app", "Streak views", "Progress charts", "Habit logs"],
+        "preview_title": "DISCIPLINE GRID",
+        "preview_lines": ["Daily streak traced", "Fitness panel synced", "Progress rings loaded", "Habit history online"],
+        "preview_signal": "LIVE",
     },
     {
         "name": "SmartRecruitAI Resume Analyzer",
@@ -66,13 +83,21 @@ PROJECTS = [
         "impact": "Automated resume-to-role recommendation workflow.",
         "demo_url": "https://smartrecruitai-app.onrender.com/",
         "repo_url": "https://github.com/surya-pratap-singh-dev/smartrecruitai_app",
+        "stats": ["Resume parse", "Role match", "Keyword scoring", "Render deploy"],
+        "preview_title": "ROLE MATCH ENGINE",
+        "preview_lines": ["Resume text parsed", "Skill tokens mapped", "Role score generated", "Recommendation issued"],
+        "preview_signal": "AI",
     },
     {
         "name": "AI Interview Coach",
         "description": "Built an AI-powered interview coaching app that simulates real interview scenarios by generating role-specific questions and evaluating user responses via voice input.",
         "tech": ["React", "TypeScript", "Google AI Studio (Gemini API)", "Speech-to-Text"],
         "impact": "Enabled real-time interview practice with AI-generated feedback, improving candidate readiness through interactive voice-based sessions.",
-        "repo_url": "https://github.com/surya-pratap-singh-dev/ai-interview-coach"
+        "repo_url": "https://github.com/surya-pratap-singh-dev/ai-interview-coach",
+        "stats": ["Voice input", "Gemini API", "Role prompts", "Realtime feedback"],
+        "preview_title": "INTERVIEW SIM",
+        "preview_lines": ["Role profile loaded", "Voice response captured", "AI feedback streamed", "Practice loop complete"],
+        "preview_signal": "VOICE",
     }
 ]
 
@@ -151,36 +176,42 @@ BLOG_POSTS = [
     "title": "I Built a Bot That Watches GitHub 24/7 So I Don't Have To",
     "excerpt": "Automated open-source issue tracking with Python, Docker, and AWS EC2. A self-hosted CI/CD pipeline that sends hourly email digests of new GitHub issues.",
     "url": "https://medium.com/@suryabhaisince2002/i-built-a-bot-that-watches-github-24-7-so-i-dont-have-to-3258f1e62ada",
+    "related": "GitHub OSS Issue Notifier",
     },
     {
         "read_time": "4 MIN READ",
         "title": "Cloud Storage App: Auth Has To Be System-Level",
         "excerpt": "I learned that login is just step one. Real security came from permission checks on every file action and predictable token/session handling.",
         "url": "https://github.com/surya-pratap-singh-dev/drive-clone",
+        "related": "Cloud Storage Web App",
     },
     {
         "read_time": "5 MIN READ",
         "title": "CGAN Project: Data Quality Beats Fancy Models",
         "excerpt": "Most gains came from data prep and evaluation discipline. Balancing fraud classes and validating generated patterns mattered more than architecture tweaks.",
         "url": "https://medium.com/@suryabhaisince2002/i-built-a-gan-that-generates-fake-bank-fraud-data-heres-what-actually-happened-9ed58400c6f5",
+        "related": "CGAN Generator",
     },
     {
         "read_time": "3 MIN READ",
         "title": "IronMind: UX Clarity Drives Retention",
         "excerpt": "Users stuck with the app when progress looked obvious. Lightweight visuals and streak feedback improved engagement without overcomplicating the product.",
         "url": "https://github.com/surya-pratap-singh-dev/iron-mind-project",
+        "related": "IronMind Tracker",
     },
     {
         "read_time": "3 MIN READ",
         "title": "SmartRecruitAI: Relevance Is Better Than Volume",
         "excerpt": "Keyword matching worked best when tuned for role context. Precision in mapping signals to roles outperformed broad, noisy scoring strategies.",
         "url": "https://github.com/surya-pratap-singh-dev/smartrecruitai_app",
+        "related": "SmartRecruitAI",
     },
     {
         "read_time": "4 MIN READ",
         "title": "AI Interview Coach: Latency Changes Product Feel",
         "excerpt": "Fast response loops made practice feel realistic. I focused on prompt structure and response timing to keep the coaching flow smooth and useful.",
         "url": "https://github.com/surya-pratap-singh-dev/ai-interview-coach",
+        "related": "AI Interview Coach",
     },
 ]
 

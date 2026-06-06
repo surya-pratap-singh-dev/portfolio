@@ -161,9 +161,19 @@ window.addEventListener("DOMContentLoaded", () => {
     const viewBtns = Array.from(document.querySelectorAll("[data-view]"));
     const arrowPrev = document.querySelector("[data-arrow='prev']");
     const arrowNext = document.querySelector("[data-arrow='next']");
+    const projectCount = document.querySelector("[data-project-count]");
+    const projectProgress = document.querySelector("[data-project-progress]");
     let currentSlide = 0;
     let currentView = "slider";
     let horizontalST = null;
+
+    const setActiveSlide = (index) => {
+        if (!slides.length) return;
+        currentSlide = Math.max(0, Math.min(index, slides.length - 1));
+        slides.forEach((slide, i) => slide.classList.toggle("is-active", i === currentSlide));
+        if (projectCount) projectCount.textContent = `${pad(currentSlide + 1)} / ${pad(slides.length)}`;
+        if (projectProgress) projectProgress.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+    };
 
     const setView = (view) => {
         currentView = view;
@@ -173,12 +183,13 @@ window.addEventListener("DOMContentLoaded", () => {
         }
         // Kill existing horizontal ScrollTrigger if switching views
         if (horizontalST) { horizontalST.kill(); horizontalST = null; }
-        if (sliderTrack) gsap.set(sliderTrack, { x: 0 });
+        if (sliderTrack && window.gsap) gsap.set(sliderTrack, { x: 0 });
 
         if (view === "slider" && !isMobile && window.gsap && window.ScrollTrigger) {
             initHorizontalScroll();
         }
         if (window.ScrollTrigger) ScrollTrigger.refresh();
+        setActiveSlide(0);
     };
 
     viewBtns.forEach((btn) => {
@@ -188,22 +199,42 @@ window.addEventListener("DOMContentLoaded", () => {
     // Arrow navigation
     const scrollToSlide = (index) => {
         if (!slides.length) return;
-        currentSlide = Math.max(0, Math.min(index, slides.length - 1));
+        setActiveSlide(index);
         if (isMobile && sliderWrap) {
             // Mobile: scroll the native scroll container
             const slideEl = slides[currentSlide];
             sliderWrap.scrollTo({ left: slideEl.offsetLeft - 16, behavior: "smooth" });
+        } else if (horizontalST) {
+            const step = (horizontalST.end - horizontalST.start) / Math.max(1, slides.length - 1);
+            window.scrollTo({ top: horizontalST.start + step * currentSlide, behavior: "smooth" });
         } else if (sliderTrack && sliderWrap) {
             // Desktop: animate track position
             const slideEl = slides[currentSlide];
             const maxScroll = sliderTrack.scrollWidth - sliderWrap.clientWidth;
             const target = Math.min(slideEl.offsetLeft, maxScroll);
-            gsap.to(sliderTrack, { x: -target, duration: 0.5, ease: "power2.out" });
+            if (window.gsap) gsap.to(sliderTrack, { x: -target, duration: 0.5, ease: "power2.out" });
         }
     };
 
     if (arrowPrev) arrowPrev.addEventListener("click", () => scrollToSlide(currentSlide - 1));
     if (arrowNext) arrowNext.addEventListener("click", () => scrollToSlide(currentSlide + 1));
+
+    if (sliderWrap && slides.length) {
+        let slideScrollTimer;
+        sliderWrap.addEventListener("scroll", () => {
+            if (!isMobile) return;
+            clearTimeout(slideScrollTimer);
+            slideScrollTimer = setTimeout(() => {
+                const nearest = slides.reduce((best, slide, i) => {
+                    const distance = Math.abs(slide.offsetLeft - sliderWrap.scrollLeft - 16);
+                    return distance < best.distance ? { i, distance } : best;
+                }, { i: currentSlide, distance: Infinity });
+                setActiveSlide(nearest.i);
+            }, 80);
+        }, { passive: true });
+    }
+
+    setActiveSlide(0);
 
     // ─── Preloader ───────────────────────────────────────────────────────────
     const STATUS_MESSAGES = [
@@ -337,9 +368,9 @@ window.addEventListener("DOMContentLoaded", () => {
             const getBlogDist = () => Math.max(0, blogTrack.scrollWidth - blogRail.clientWidth);
 
             gsap.fromTo(blogCards,
-                { autoAlpha: 0, y: 28 },
+                { autoAlpha: 0, y: 34, rotation: -1.4 },
                 {
-                    autoAlpha: 1, y: 0, duration: 0.55, stagger: 0.09, ease: "power2.out",
+                    autoAlpha: 1, y: 0, rotation: 0, duration: 0.62, stagger: 0.09, ease: "power2.out",
                     scrollTrigger: { trigger: "#blog", start: isMobile ? "top 90%" : "top 78%", once: true },
                 }
             );
@@ -400,6 +431,11 @@ window.addEventListener("DOMContentLoaded", () => {
                 target.addEventListener("mouseenter", () => { if (pointerLabel) pointerLabel.textContent = "SCAN"; });
                 target.addEventListener("mouseleave", () => { if (pointerLabel && !cursorShell.classList.contains("is-link")) pointerLabel.textContent = "TRACK"; });
             });
+
+            document.querySelectorAll(".blog-card").forEach((target) => {
+                target.addEventListener("mouseenter", () => { if (pointerLabel) pointerLabel.textContent = "READ"; });
+                target.addEventListener("mouseleave", () => { if (pointerLabel && !cursorShell.classList.contains("is-link")) pointerLabel.textContent = "TRACK"; });
+            });
         }
 
         // ─── ScrollTrigger refresh ───────────────────────────────────────────
@@ -436,6 +472,10 @@ window.addEventListener("DOMContentLoaded", () => {
                 pin: true,
                 anticipatePin: 1,
                 invalidateOnRefresh: true,
+                onUpdate: (self) => {
+                    const nextIndex = Math.round(self.progress * Math.max(0, slides.length - 1));
+                    if (nextIndex !== currentSlide) setActiveSlide(nextIndex);
+                },
             },
         });
 

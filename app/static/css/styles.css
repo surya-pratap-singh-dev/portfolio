@@ -893,6 +893,40 @@ main {
     color: var(--text);
 }
 
+.project-progress {
+    margin-top: 0.9rem;
+    display: grid;
+    grid-template-columns: auto auto minmax(140px, 1fr);
+    align-items: center;
+    gap: 0.7rem;
+    max-width: 460px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+}
+
+.project-progress-count {
+    color: var(--accent-soft);
+}
+
+.project-progress-track {
+    position: relative;
+    display: block;
+    height: 3px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.09);
+}
+
+.project-progress-track span {
+    display: block;
+    width: 16.66%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--teal));
+    box-shadow: 0 0 14px rgba(255, 46, 46, 0.45);
+    transition: width 260ms ease;
+}
+
 /* ─── Project Slider ──────────────────────────────────────────────────── */
 .project-slider-wrap {
     margin-top: 1.2rem;
@@ -908,28 +942,67 @@ main {
 
 .project-slide {
     flex: 0 0 clamp(280px, 28vw, 360px);
-    min-height: 520px;
+    min-height: 570px;
     border: 1px solid var(--line);
     background: linear-gradient(145deg, color-mix(in srgb, var(--panel-hard) 91%, transparent), color-mix(in srgb, var(--panel-hard) 72%, transparent));
     box-shadow: var(--shadow);
     display: flex;
     flex-direction: column;
-    transition: border-color 300ms ease;
+    overflow: hidden;
+    transform-origin: center;
+    transition: border-color 300ms ease, box-shadow 300ms ease, transform 300ms ease;
 }
 
-.project-slide:hover {
+.project-slide:hover,
+.project-slide.is-active {
     border-color: var(--line-strong);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.62), 0 0 34px rgba(255, 46, 46, 0.12);
+}
+
+.project-slide.is-active {
+    transform: translateY(-6px);
+}
+
+.project-window-bar {
+    height: 38px;
+    border-bottom: 1px solid var(--line);
+    background:
+        linear-gradient(90deg, rgba(255, 46, 46, 0.08), transparent 40%),
+        color-mix(in srgb, var(--panel-hard) 93%, transparent);
+    display: flex;
+    align-items: center;
+    gap: 0.42rem;
+    padding: 0 0.78rem;
+}
+
+.window-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    box-shadow: 0 0 12px currentColor;
+}
+
+.window-dot-red { color: var(--accent); background: var(--accent); }
+.window-dot-yellow { color: #ffd166; background: #ffd166; }
+.window-dot-green { color: var(--lime); background: var(--lime); }
+
+.window-path {
+    margin-left: auto;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    white-space: nowrap;
 }
 
 .project-slide-visual {
     position: relative;
-    height: 180px;
+    height: 220px;
     background:
         radial-gradient(circle at 30% 40%, rgba(255, 46, 46, 0.15), transparent 50%),
         radial-gradient(circle at 80% 70%, rgba(108, 238, 255, 0.08), transparent 40%),
         color-mix(in srgb, var(--panel-hard) 96%, black);
-    display: grid;
-    place-items: center;
+    padding: 0.72rem;
     overflow: hidden;
     border-bottom: 1px solid var(--line);
 }
@@ -954,13 +1027,64 @@ main {
     pointer-events: none;
 }
 
-.slide-number {
+.project-preview-window {
     position: relative;
     z-index: 2;
+    height: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    background: rgba(4, 5, 7, 0.64);
+    display: grid;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
+}
+
+.preview-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 0.45rem 0.55rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.13em;
+    color: var(--accent-soft);
+}
+
+.preview-head span:last-child {
+    color: var(--lime);
+}
+
+.preview-screen {
+    position: relative;
+    overflow: hidden;
+    padding: 0.8rem;
+}
+
+.preview-lines {
+    position: relative;
+    z-index: 3;
+    display: grid;
+    gap: 0.34rem;
+    max-width: 78%;
+}
+
+.preview-lines p {
+    margin: 0;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.64rem;
+    letter-spacing: 0.04em;
+    color: var(--text-soft);
+}
+
+.slide-number {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.2rem;
+    z-index: 2;
     font-family: "Cormorant Garamond", serif;
-    font-size: 4.5rem;
+    font-size: 5.2rem;
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.07);
     letter-spacing: 0.05em;
 }
 
@@ -1024,6 +1148,28 @@ main {
     font-size: 0.88rem;
 }
 
+.project-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.42rem;
+}
+
+.project-stats span {
+    min-height: 34px;
+    border: 1px solid rgba(255, 46, 46, 0.34);
+    background:
+        linear-gradient(135deg, rgba(255, 46, 46, 0.13), transparent),
+        color-mix(in srgb, var(--panel-hard) 84%, transparent);
+    color: var(--text);
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 0.34rem 0.42rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.05em;
+}
+
 .project-techs {
     display: flex;
     flex-wrap: wrap;
@@ -1082,9 +1228,9 @@ main {
 }
 .projects.list-view .project-slide {
     flex: 1 1 340px;
-    min-height: 400px;
+    min-height: 470px;
 }
-.projects.list-view .project-slide-visual { height: 120px; }
+.projects.list-view .project-slide-visual { height: 190px; }
 .projects.list-view .slider-arrows { display: none; }
 
 .timeline {
@@ -1154,6 +1300,28 @@ main {
     border-left: 1px solid var(--line);
     border-right: 1px solid var(--line);
     padding: 0.95rem 0;
+    position: relative;
+}
+
+.blog-rail::before,
+.blog-rail::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 90px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.blog-rail::before {
+    left: 0;
+    background: linear-gradient(90deg, var(--bg), transparent);
+}
+
+.blog-rail::after {
+    right: 0;
+    background: linear-gradient(270deg, var(--bg), transparent);
 }
 
 .blog-grid {
@@ -1167,13 +1335,54 @@ main {
     width: clamp(260px, 30vw, 350px);
     min-height: 330px;
     border: 1px solid var(--line);
-    background: color-mix(in srgb, var(--panel-hard) 88%, transparent);
+    background:
+        linear-gradient(145deg, rgba(255, 46, 46, 0.08), transparent 42%),
+        color-mix(in srgb, var(--panel-hard) 88%, transparent);
     padding: 1rem;
     display: flex;
     flex-direction: column;
     gap: 0.65rem;
     box-shadow: var(--shadow);
     transform-origin: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 260ms ease, border-color 260ms ease, box-shadow 260ms ease;
+}
+
+.blog-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), transparent 64%);
+}
+
+.blog-card::after {
+    content: "LOG";
+    position: absolute;
+    right: 0.8rem;
+    bottom: 0.65rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.035);
+    pointer-events: none;
+}
+
+.blog-card:hover {
+    transform: translateY(-8px) rotate(-0.6deg);
+    border-color: var(--line-strong);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.58), 0 0 30px rgba(255, 46, 46, 0.1);
+}
+
+.blog-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.7rem;
 }
 
 .blog-read {
@@ -1182,6 +1391,18 @@ main {
     color: var(--text-dim);
     font-size: 0.68rem;
     letter-spacing: 0.14em;
+}
+
+.blog-related {
+    max-width: 150px;
+    border: 1px solid rgba(108, 238, 255, 0.35);
+    color: var(--teal);
+    padding: 0.24rem 0.38rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.08em;
+    text-align: right;
+    text-transform: uppercase;
 }
 
 .blog-card h3 {
@@ -1319,10 +1540,30 @@ main {
     .project-slide {
         flex: 0 0 min(82vw, 320px);
         scroll-snap-align: start;
-        min-height: 460px;
+        min-height: 560px;
     }
 
-    .project-slide-visual { height: 140px; }
+    .project-progress {
+        grid-template-columns: 1fr;
+        align-items: start;
+        max-width: 100%;
+    }
+
+    .project-slide-visual { height: 210px; }
+
+    .window-path {
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .preview-lines {
+        max-width: 88%;
+    }
+
+    .project-stats {
+        grid-template-columns: 1fr;
+    }
 
     .profile-grid {
         grid-template-columns: 1fr;
@@ -1336,6 +1577,20 @@ main {
     .blog-card {
         width: min(78vw, 330px);
         min-height: 360px;
+    }
+
+    .blog-rail::before,
+    .blog-rail::after {
+        width: 36px;
+    }
+
+    .blog-card-top {
+        flex-direction: column;
+    }
+
+    .blog-related {
+        max-width: 100%;
+        text-align: left;
     }
 
     .subject-meta-grid,

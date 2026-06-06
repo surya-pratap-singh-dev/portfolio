@@ -95,6 +95,7 @@
             <div class="hero-cta-row intro-item">
                 <a href="#contact" class="btn btn-primary magnetic">Let's build something</a>
                 <a href="#projects" class="btn btn-ghost magnetic">Open evidence board</a>
+                <a href="{{ owner.resume_url }}" class="btn btn-ghost magnetic">Resume request</a>
                 <button type="button" class="track-toggle" data-track-toggle aria-label="Toggle tracking mode">
                     <span class="track-dot"></span>
                     <span class="track-toggle-label">TRACK · OFF</span>
@@ -153,20 +154,50 @@
                     <button type="button" class="arrow-btn" data-arrow="next" aria-label="Next project">›</button>
                 </div>
             </div>
+            <div class="project-progress reveal" aria-hidden="true">
+                <span class="project-progress-label">ACTIVE FILE</span>
+                <span class="project-progress-count" data-project-count>01 / {{ projects|length }}</span>
+                <span class="project-progress-track"><span data-project-progress></span></span>
+            </div>
 
             <div class="project-slider-wrap" data-slider-wrap>
                 <div class="project-slider-track" data-slider-track>
                     {% for project in projects %}
                     <article class="project-slide" data-slide>
+                        <div class="project-window-bar">
+                            <span class="window-dot window-dot-red"></span>
+                            <span class="window-dot window-dot-yellow"></span>
+                            <span class="window-dot window-dot-green"></span>
+                            <span class="window-path">~/evidence/file_0{{ loop.index }}</span>
+                        </div>
                         <div class="project-slide-visual">
-                            <span class="slide-dots"></span>
-                            <span class="slide-number">0{{ loop.index }}</span>
-                            <span class="slide-tag">{{ project.tech[0] | upper if project.tech else 'PROJECT' }}</span>
+                            <div class="project-preview-window">
+                                <div class="preview-head">
+                                    <span>{{ project.preview_title }}</span>
+                                    <span>{{ project.preview_signal }}</span>
+                                </div>
+                                <div class="preview-screen">
+                                    <span class="slide-number">0{{ loop.index }}</span>
+                                    <span class="slide-tag">{{ project.tech[0] | upper if project.tech else 'PROJECT' }}</span>
+                                    <div class="preview-lines">
+                                        {% for line in project.preview_lines %}
+                                        <p>&gt; {{ line }}</p>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="project-slide-body">
                             <p class="project-index">FILE 0{{ loop.index }}</p>
                             <h3>{{ project.name }}</h3>
                             <p class="project-description">{{ project.description }}</p>
+                            {% if project.stats %}
+                            <div class="project-stats">
+                                {% for stat in project.stats %}
+                                <span>{{ stat }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
                             <div class="project-techs">
                                 {% for tech in project.tech %}
                                 <span>{{ tech }}</span>
@@ -315,7 +346,12 @@
                 <div class="blog-grid" data-blog-track>
                     {% for post in blog_posts %}
                     <article class="blog-card">
-                        <p class="blog-read">{{ post.read_time }}</p>
+                        <div class="blog-card-top">
+                            <p class="blog-read">{{ post.read_time }}</p>
+                            {% if post.related %}
+                            <span class="blog-related">{{ post.related }}</span>
+                            {% endif %}
+                        </div>
                         <h3>{{ post.title }}</h3>
                         <p>{{ post.excerpt }}</p>
                         <a href="{{ post.url }}" target="_blank" rel="noreferrer" class="magnetic">Read article</a>
@@ -333,6 +369,7 @@
                 <p class="contact-sub">If you have a product, internship, or wild concept, I'm in.</p>
                 <div class="contact-actions">
                     <a href="mailto:{{ owner.email }}" class="btn btn-primary magnetic">Send email</a>
+                    <a href="{{ owner.resume_url }}" class="btn btn-ghost magnetic">Resume request</a>
                     {% if owner.phone %}
                     <a href="tel:{{ owner.phone }}" class="btn btn-ghost magnetic"></a>
                     {% endif %}
