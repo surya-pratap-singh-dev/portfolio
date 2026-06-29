@@ -127,10 +127,10 @@ SKILL_GROUPS = [
         "items": [
             {"name": "MongoDB", "level": 82},
             {"name": "Supabase", "level": 80},
-            {"name": "AWS (Basics)", "level": 65},
+            {"name": "AWS EC2", "level": 65},
             {"name": "Git", "level": 86},
             {"name": "GitHub", "level": 85},
-            {"name": "Postman", "level": 83},
+            {"name": "Docker, CI/CD", "level": 83},
         ],
     },
 ]
@@ -167,9 +167,9 @@ EXPERIENCE = [
 ]
 
 ABOUT_STORY = [
-    "I am a final-year BTech CSE student who enjoys building practical software that solves real problems.",
-    "Currently focused on backend + cloud systems and actively seeking opportunities to build real-world products",
-    "I am now looking to contribute to a strong team and keep improving through real product execution.",
+    "I'm a backend engineer who builds practical software that solves real problems — and ships it.",
+    "I focus on backend + cloud systems: APIs that don't fall over, CI/CD pipelines that actually deploy, and infra I've configured myself instead of just reading about. Every project on this page is live in production, not a tutorial clone.",
+    "I'm now looking to bring that same execution to a real team — solving real problems, shipping real product.",
 ]
 
 BLOG_POSTS = [
@@ -226,7 +226,7 @@ SOCIAL_LINKS = [
 PROFILE_RECORD = {
     "case_id": "SPS-2026-IN",
     "status": "Backend Engineer | Shipping scalable apps with Python Fast API & Node.js",
-    "class_code": "BTECH_CSE",
+    "class_code": "CSE GRADUATE '26",
     "xp_level": "BACKEND",
     "availability": "OPEN TO WORK",
     "languages": [
@@ -240,7 +240,7 @@ PROFILE_RECORD = {
         },
         {
             "label": "Current Focus",
-            "period": "Final Year",
+            "period": "Backend Systems ",
             "detail": "Backend systems, cloud-based web applications, and API-driven architecture.",
         },
     ],
