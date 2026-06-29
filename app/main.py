@@ -1,7 +1,9 @@
 from datetime import datetime
 
+from pathlib import Path
+
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -25,7 +27,7 @@ OWNER = {
     "tagline": "Backend Engineer | Building scalable web apps & AI tools",
     "location": "Kanpur, Uttar Pradesh, India",
     "email": "suryapratapsingh7054039@gmail.com",
-    "resume_url": "mailto:suryapratapsingh7054039@gmail.com?subject=Resume%20request%20-%20Surya%20Pratap%20Singh",
+    "resume_url": "/resume",
 }
 
 PROJECTS = [
@@ -251,6 +253,19 @@ PROFILE_RECORD = {
         "Consistency",
     ],
 }
+
+
+RESUME_PATH = Path(__file__).resolve().parent / "static" / "Surya_Pratap_Singh_Resume.pdf"
+
+
+@app.get("/resume")
+async def download_resume():
+    """Serve the resume PDF as a direct download."""
+    return FileResponse(
+        path=RESUME_PATH,
+        filename="Surya_Pratap_Singh_Resume.pdf",
+        media_type="application/pdf",
+    )
 
 
 @app.get("/", response_class=HTMLResponse)

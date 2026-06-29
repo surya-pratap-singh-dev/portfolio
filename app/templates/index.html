@@ -95,7 +95,7 @@
             <div class="hero-cta-row intro-item">
                 <a href="#contact" class="btn btn-primary magnetic">Let's build something</a>
                 <a href="#projects" class="btn btn-ghost magnetic">Open evidence board</a>
-                <a href="{{ owner.resume_url }}" class="btn btn-ghost magnetic">Resume request</a>
+                <a href="{{ owner.resume_url }}" class="btn btn-ghost magnetic" download>Download Resume</a>
                 <button type="button" class="track-toggle" data-track-toggle aria-label="Toggle tracking mode">
                     <span class="track-dot"></span>
                     <span class="track-toggle-label">TRACK · OFF</span>
@@ -327,7 +327,7 @@
         <section id="about" class="scene scene-pad section-anchor" data-section-label="About">
             <div class="scene-head reveal">
                 <p class="scene-eyebrow">Profile</p>
-                <h2>Short story, zero fluff.</h2>
+                <h2>Short story.</h2>
             </div>
             <article class="about-panel reveal">
                 {% for line in about_story %}
@@ -369,7 +369,7 @@
                 <p class="contact-sub">If you have a product, internship, or wild concept, I'm in.</p>
                 <div class="contact-actions">
                     <a href="mailto:{{ owner.email }}" class="btn btn-primary magnetic">Send email</a>
-                    <a href="{{ owner.resume_url }}" class="btn btn-ghost magnetic">Resume request</a>
+                    <a href="{{ owner.resume_url }}" class="btn btn-ghost magnetic">Download Resume</a>
                     {% if owner.phone %}
                     <a href="tel:{{ owner.phone }}" class="btn btn-ghost magnetic"></a>
                     {% endif %}
