@@ -108,15 +108,15 @@ SKILL_GROUPS = [
         "category": "Languages",
         "items": [
             {"name": "Python", "level": 90},
-            {"name": "JavaScript", "level": 80},
+            {"name": "Go", "level": 80},
             {"name": "SQL", "level": 78},
         ],
     },
     {
         "category": "Backend",
         "items": [
-            {"name": "Node.js", "level": 84},
-            {"name": "Express.js", "level": 82},
+            {"name": "Docker, CI/CD", "level": 84},
+            {"name": "Linux", "level": 82},
             {"name": "FastAPI", "level": 87},
             {"name": "REST APIs", "level": 88},
             {"name": "JWT Authentication", "level": 82},
@@ -128,9 +128,7 @@ SKILL_GROUPS = [
             {"name": "MongoDB", "level": 82},
             {"name": "Supabase", "level": 80},
             {"name": "AWS EC2", "level": 65},
-            {"name": "Git", "level": 86},
-            {"name": "GitHub", "level": 85},
-            {"name": "Docker, CI/CD", "level": 83},
+            {"name": "Git & GitHub", "level": 86},
         ],
     },
 ]
