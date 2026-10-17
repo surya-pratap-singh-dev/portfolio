@@ -45,6 +45,34 @@ body {
     overflow-x: clip;
 }
 
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+/* Lenis smooth scrolling (set up in main.js) */
+html.lenis,
+html.lenis body {
+    height: auto;
+}
+
+.lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+    overflow: hidden;
+}
+
+a,
+button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.section-anchor {
+    scroll-margin-top: 90px;
+}
+
 body {
     background:
         radial-gradient(circle at 50% -25%, rgba(255, 46, 46, 0.16), transparent 60%),
@@ -57,14 +85,71 @@ body {
     transition: background-color 260ms ease, color 260ms ease;
 }
 
+/* Dark mode sits deeper in the dark: the same glows, much fainter, so the background
+   network and its flashlight carry the atmosphere. Light mode keeps the rule above. */
+html:not(.theme-light) body {
+    background:
+        radial-gradient(circle at 50% -25%, rgba(255, 46, 46, 0.07), transparent 60%),
+        radial-gradient(circle at 90% 0%, rgba(108, 238, 255, 0.035), transparent 40%),
+        radial-gradient(circle at 10% 100%, rgba(190, 252, 140, 0.025), transparent 45%),
+        var(--bg);
+}
+
 body.has-custom-cursor {
     cursor: none;
+}
+
+/* "SECTOR // …" tag shown briefly after a left/right section jump */
+.sector-toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(1.4rem + env(safe-area-inset-bottom, 0px));
+    z-index: 125;
+    padding: 0.55rem 0.9rem;
+    border: 1px solid var(--line-strong);
+    background: color-mix(in srgb, var(--panel-hard) 92%, transparent);
+    backdrop-filter: blur(8px);
+    box-shadow: var(--shadow);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-soft);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    translate: -50% 12px;
+    transition: opacity 250ms ease, translate 350ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sector-toast.is-visible {
+    opacity: 1;
+    translate: -50% 0;
+}
+
+.section-status-hint {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
 }
 
 .noise-layer,
 .scanline-layer {
     position: fixed;
     inset: 0;
+    pointer-events: none;
+}
+
+/* Background network (drawn by network.js). z-index -1 keeps it under all page content,
+   including the footer, while still above the body's background gradients. */
+.net-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: -1;
     pointer-events: none;
 }
 
@@ -197,8 +282,10 @@ body.has-custom-cursor {
 .top-nav {
     position: fixed;
     top: 1.15rem;
-    left: 50%;
-    transform: translateX(-50%);
+    /* Centered without transform: GSAP owns this element's transform for the intro */
+    left: 0;
+    right: 0;
+    margin-inline: auto;
     width: min(1120px, calc(100vw - 3rem));
     z-index: 100;
     border: 1px solid var(--line);
@@ -276,6 +363,7 @@ body.has-custom-cursor {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
+    white-space: nowrap;
     cursor: pointer;
     transition: transform 180ms ease, background-color 180ms ease;
 }
@@ -319,6 +407,32 @@ body.has-custom-cursor {
     min-width: 110px;
 }
 
+/* The HUD boxes live in the side gutter. Where the gutter gets narrow they slim down
+   (no location line), and where it can't hold them at all they hide, so they never cover content. */
+@media (max-width: 1500px) {
+    .corner-readout {
+        right: 0.75rem;
+        padding: 0.45rem 0.55rem;
+    }
+
+    .corner-readout .hud-small:first-child {
+        display: none;
+    }
+
+    .section-status {
+        right: 0.75rem;
+        min-width: 0;
+        padding: 0.5rem 0.6rem;
+    }
+}
+
+@media (max-width: 1359px) {
+    .corner-readout,
+    .section-status {
+        display: none;
+    }
+}
+
 .section-status-label {
     font-family: "IBM Plex Mono", monospace;
     font-size: 0.62rem;
@@ -343,6 +457,7 @@ main {
 
 .hero {
     min-height: 100vh;
+    min-height: 100svh;
     padding-top: 160px;
     padding-bottom: 60px;
     position: relative;
@@ -383,8 +498,25 @@ main {
     max-width: 780px;
 }
 
-.hero-name span {
+.hero-name > span {
     display: block;
+}
+
+/* Letter-by-letter intro (split by main.js). The padding/negative-margin pair gives the mask
+   room for the serif's tall capitals and descenders without changing the layout. */
+.split-line {
+    overflow: hidden;
+    padding: 0.12em 0 0.24em;
+    margin: -0.12em 0 -0.24em;
+}
+
+.split-word,
+.split-char {
+    display: inline-block;
+}
+
+.split-word {
+    white-space: nowrap;
 }
 
 .hero-lead {
@@ -400,7 +532,32 @@ main {
     color: var(--text-dim);
 }
 
+/* Page spotlight: the whole portfolio sits in shadow and a light (with a faint red core)
+   follows the cursor; on touch screens it rests over the middle of the screen and sways.
+   It lives inside <main> so the hero buttons and logs (z-index 6) stay above it, while the
+   nav, HUD and cursor (outside <main>) stay lit. */
+.page-spotlight {
+    --spot-x: 50%;
+    --spot-y: 45%;
+    --spot-r: 170px;
+    --spot-fade: 760px;
+    --spot-dim: 84%;
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at var(--spot-x) var(--spot-y), rgba(255, 46, 46, 0.06), transparent var(--spot-r)),
+        radial-gradient(circle at var(--spot-x) var(--spot-y), transparent var(--spot-r), color-mix(in srgb, var(--bg) var(--spot-dim), transparent) var(--spot-fade));
+}
+
+html.theme-light .page-spotlight {
+    --spot-dim: 66%;
+}
+
 .hero-cta-row {
+    position: relative;
+    z-index: 6;
     display: flex;
     flex-wrap: wrap;
     gap: 0.8rem;
@@ -416,7 +573,14 @@ main {
     text-decoration: none;
     font-weight: 700;
     border: 1px solid transparent;
-    transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+    /* Hover lift uses `translate` so it stacks with GSAP's magnetic `transform` instead of fighting it */
+    transition: translate 180ms ease, scale 120ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+/* Press feedback, on touch screens too */
+.btn:active,
+.arrow-btn:active {
+    scale: 0.96;
 }
 
 .btn-primary {
@@ -425,21 +589,29 @@ main {
     box-shadow: 0 10px 22px rgba(255, 46, 46, 0.28);
 }
 
-.btn-primary:hover,
-.btn-primary:focus-visible {
-    transform: translateY(-2px);
-}
-
 .btn-ghost {
     background: color-mix(in srgb, var(--panel-hard) 90%, transparent);
     color: var(--text);
     border-color: var(--line);
 }
 
-.btn-ghost:hover,
+.btn:focus-visible {
+    translate: 0 -2px;
+}
+
 .btn-ghost:focus-visible {
-    transform: translateY(-2px);
     background: color-mix(in srgb, var(--panel-hard) 96%, transparent);
+}
+
+/* Hover only where hover exists, so taps on touch screens don't leave buttons stuck lifted */
+@media (hover: hover) {
+    .btn:hover {
+        translate: 0 -2px;
+    }
+
+    .btn-ghost:hover {
+        background: color-mix(in srgb, var(--panel-hard) 96%, transparent);
+    }
 }
 
 .floating-card {
@@ -752,9 +924,24 @@ main {
 
 .report-lead span {
     color: #fff;
-    background: rgba(255, 46, 46, 0.42);
+    /* Same fill as before, drawn as a gradient so it can be swept in like a highlighter */
+    background: linear-gradient(rgba(255, 46, 46, 0.42), rgba(255, 46, 46, 0.42)) no-repeat 0 0 / 100% 100%;
+    transition: background-size 0.9s cubic-bezier(0.65, 0, 0.35, 1);
     padding: 0.03rem 0.34rem;
     border: 1px solid rgba(255, 46, 46, 0.7);
+}
+
+.marker-armed span {
+    background-size: 0% 100%;
+}
+
+.marker-armed.is-marked span {
+    background-size: 100% 100%;
+    transition-delay: 0.3s;
+}
+
+.marker-armed.is-marked span + span {
+    transition-delay: 0.75s;
 }
 
 .report-block {
@@ -829,6 +1016,20 @@ main {
     border-color: rgba(255, 46, 46, 0.42);
 }
 
+/* Tags flash one after another, then settle (order set as --i by main.js) */
+.inventory-tags.is-scanning span {
+    animation: tagScan 0.9s ease-out;
+    animation-delay: calc(var(--i, 0) * 45ms);
+}
+
+@keyframes tagScan {
+    0% {
+        border-color: var(--accent);
+        color: var(--accent-soft);
+        box-shadow: 0 0 14px rgba(255, 46, 46, 0.35);
+    }
+}
+
 /* ─── Project Controls ─────────────────────────────────────────────────── */
 .project-controls {
     margin-top: 1.5rem;
@@ -885,7 +1086,7 @@ main {
     cursor: pointer;
     display: grid;
     place-items: center;
-    transition: border-color 180ms ease, color 180ms ease;
+    transition: border-color 180ms ease, color 180ms ease, scale 120ms ease;
 }
 
 .arrow-btn:hover {
@@ -929,7 +1130,9 @@ main {
 
 /* ─── Project Slider ──────────────────────────────────────────────────── */
 .project-slider-wrap {
-    margin-top: 1.2rem;
+    /* Top padding leaves room for the active slide's lift so its border isn't clipped */
+    margin-top: 0.7rem;
+    padding-top: 0.5rem;
     overflow: hidden;
     position: relative;
 }
@@ -950,17 +1153,329 @@ main {
     flex-direction: column;
     overflow: hidden;
     transform-origin: center;
-    transition: border-color 300ms ease, box-shadow 300ms ease, transform 300ms ease;
+    /* `translate`, not `transform`: GSAP animates transform for the reveal, and a CSS transition
+       on the same property makes the tween stutter */
+    transition: border-color 300ms ease, box-shadow 300ms ease, translate 300ms ease, scale 400ms ease;
 }
 
-.project-slide:hover,
+/* Once the slider is on screen (.slides-armed, set by main.js), files that aren't active
+   step back a little. Not in list view, where every card should read the same. */
+.slides-armed .project-slide > * {
+    transition: opacity 400ms ease;
+}
+
+.projects:not(.list-view) .slides-armed .project-slide:not(.is-active) {
+    scale: 0.97;
+}
+
+.projects:not(.list-view) .slides-armed .project-slide:not(.is-active) > * {
+    opacity: 0.55;
+}
+
+/* The active file types out its terminal lines and a scan band sweeps its screen.
+   Both restart each time a slide becomes active. */
+.slides-armed .project-slide.is-active .preview-lines p {
+    animation: typeLine 0.55s steps(24, end) both;
+    animation-delay: calc(0.2s + var(--line, 0) * 0.3s);
+}
+
+.preview-lines p:nth-child(2) { --line: 1; }
+.preview-lines p:nth-child(3) { --line: 2; }
+.preview-lines p:nth-child(4) { --line: 3; }
+.preview-lines p:nth-child(5) { --line: 4; }
+.preview-lines p:nth-child(6) { --line: 5; }
+
+.slides-armed .project-slide.is-active .preview-lines p:last-child::after {
+    content: "_";
+    margin-left: 0.2em;
+    color: var(--accent-soft);
+    animation: blink 1s step-end infinite;
+}
+
+.preview-screen::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 40%;
+    z-index: 1;
+    background: linear-gradient(to bottom, transparent, rgba(255, 46, 46, 0.14), transparent);
+    transform: translateY(-110%);
+    pointer-events: none;
+}
+
+.slides-armed .project-slide.is-active .preview-screen::after {
+    animation: screenSweep 1.4s ease-in-out both;
+}
+
+@keyframes typeLine {
+    from { clip-path: inset(0 100% 0 0); }
+    to { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes screenSweep {
+    from { transform: translateY(-110%); }
+    to { transform: translateY(260%); }
+}
+
 .project-slide.is-active {
     border-color: var(--line-strong);
     box-shadow: 0 30px 70px rgba(0, 0, 0, 0.62), 0 0 34px rgba(255, 46, 46, 0.12);
+    translate: 0 -6px;
 }
 
-.project-slide.is-active {
-    transform: translateY(-6px);
+.project-slide[data-href] {
+    cursor: pointer;
+}
+
+/* Corner brackets lock onto the open file */
+.project-slide {
+    position: relative;
+}
+
+.project-slide::before,
+.project-slide::after {
+    content: "";
+    position: absolute;
+    bottom: 8px;
+    z-index: 4;
+    width: 16px;
+    height: 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 300ms ease, translate 400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.project-slide::before {
+    left: 8px;
+    border-left: 1px solid var(--accent);
+    border-bottom: 1px solid var(--accent);
+    translate: -8px 8px;
+}
+
+.project-slide::after {
+    right: 8px;
+    border-right: 1px solid var(--accent);
+    border-bottom: 1px solid var(--accent);
+    translate: 8px 8px;
+}
+
+.project-slide.is-active::before,
+.project-slide.is-active::after {
+    opacity: 1;
+    translate: 0 0;
+}
+
+/* "Click to open" prompt under the title: the whole open card links to the project */
+.project-open {
+    margin: 0;
+    padding-bottom: 0.55rem;
+    border-bottom: 1px solid var(--line-strong);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.64rem;
+    letter-spacing: 0.14em;
+    color: var(--accent-soft);
+}
+
+/* ─── Dossier board (desktop slider) ──────────────────────────────────────
+   One file is open at a time: the one scrolled into view, or the one under the cursor.
+   It widens and lights up; the rest narrow to a summary and dim. With exactly one wide
+   card, the row's total width never changes, so the pinned scroll doesn't jump. */
+@media (min-width: 901px) and (min-height: 501px) {
+    /* The board pins just under the nav, so cards can use nearly the full window height */
+    .projects:not(.list-view) .project-slider-track {
+        --slide-h: min(600px, calc(100vh - 112px));
+    }
+
+    .projects:not(.list-view) .project-slider-wrap {
+        cursor: grab;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+    .projects:not(.list-view) .project-slider-wrap.is-dragging {
+        cursor: grabbing;
+    }
+
+    body.has-custom-cursor .projects:not(.list-view) .project-slider-wrap {
+        cursor: none;
+    }
+
+    /* Board arrows stay on the board while it's pinned (the controls above scroll away) */
+    .projects:not(.list-view) .board-arrow {
+        display: grid;
+    }
+
+    /* Hover lights a file up and dims the rest, without opening it */
+    .projects:not(.list-view) .slides-armed .project-slider-track:hover .project-slide:hover > * {
+        opacity: 1;
+        filter: none;
+    }
+
+    .projects:not(.list-view) .slides-armed .project-slider-track:hover .project-slide.is-active:not(:hover) > * {
+        opacity: 0.72;
+    }
+
+    .projects:not(.list-view) .project-slide:not(.is-active):hover {
+        border-color: var(--line-strong);
+    }
+
+    .projects:not(.list-view) .project-slide {
+        flex: 0 0 290px;
+        height: var(--slide-h);
+        min-height: 0;
+        transition:
+            flex-basis 650ms cubic-bezier(0.65, 0, 0.35, 1),
+            border-color 300ms ease,
+            box-shadow 300ms ease,
+            translate 300ms ease;
+    }
+
+    .projects:not(.list-view) .project-slide.is-active {
+        flex-basis: 620px;
+    }
+
+    /* The terminal preview shrinks on shorter windows so the details and links always fit */
+    .projects:not(.list-view) .project-slide-visual {
+        height: clamp(96px, calc(100vh - 560px), 150px);
+    }
+
+    .projects:not(.list-view) .slides-armed .project-slide:not(.is-active) {
+        scale: 1;
+    }
+
+    .projects:not(.list-view) .slides-armed .project-slide > * {
+        transition: opacity 400ms ease, filter 400ms ease;
+    }
+
+    .projects:not(.list-view) .slides-armed .project-slide:not(.is-active) > * {
+        opacity: 0.5;
+        filter: saturate(0.3);
+    }
+
+    .projects:not(.list-view) .project-slide:not(.is-active) .project-description {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Details fade in once the card has finished widening, and out at once when it closes */
+    .projects:not(.list-view) .project-slide :is(.project-open, .project-stats, .project-techs, .project-impact, .project-links) {
+        transition: opacity 350ms ease 300ms;
+    }
+
+    .projects:not(.list-view) .project-slide:not(.is-active) :is(.project-open, .project-stats, .project-techs, .project-impact, .project-links) {
+        opacity: 0;
+        transition-delay: 0s;
+    }
+
+    .projects:not(.list-view) .project-slide.is-active .project-stats {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+/* Short desktop windows (e.g. a laptop with browser bars and taskbar): drop the terminal
+   preview and trim long text so the open file still shows its links */
+@media (min-width: 901px) and (min-height: 501px) and (max-height: 680px) {
+    .projects:not(.list-view) .project-slide-visual {
+        display: none;
+    }
+
+    .projects:not(.list-view) .project-slide .project-description,
+    .projects:not(.list-view) .project-slide .project-impact {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .projects:not(.list-view) .project-slide .project-impact {
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+    }
+}
+
+/* Learning logs on short desktop windows: tighter cards so the pinned section
+   (heading + cards) still fits and the heading stays on screen */
+@media (min-width: 901px) and (max-height: 760px) {
+    .blog-rail {
+        margin-top: 1.1rem;
+        padding-block: 0.6rem;
+    }
+
+    .blog-card {
+        padding: 0.85rem 1rem;
+        gap: 0.5rem;
+    }
+
+    .blog-num {
+        font-size: 2.6rem;
+    }
+
+    .blog-card > p:not([class]) {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    #blog .scene-head h2 {
+        font-size: clamp(1.6rem, 2.6vw, 2.2rem);
+    }
+}
+
+/* Board arrows (shown by the desktop board rules above) */
+.board-arrow {
+    display: none;
+    position: absolute;
+    top: 50%;
+    z-index: 6;
+    width: 42px;
+    height: 42px;
+    margin-top: -21px;
+    place-items: center;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--panel-hard) 90%, transparent);
+    backdrop-filter: blur(6px);
+    color: var(--text);
+    font-size: 1.3rem;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: opacity 250ms ease, border-color 180ms ease, scale 120ms ease;
+}
+
+.board-arrow-prev {
+    left: 10px;
+}
+
+.board-arrow-next {
+    right: 10px;
+}
+
+.board-arrow:hover {
+    border-color: var(--accent);
+}
+
+.board-arrow:active {
+    scale: 0.94;
+}
+
+.board-arrow:disabled {
+    opacity: 0;
+    pointer-events: none;
+}
+
+@media (hover: hover) {
+    .project-slide:hover {
+        border-color: var(--line-strong);
+        box-shadow: 0 30px 70px rgba(0, 0, 0, 0.62), 0 0 34px rgba(255, 46, 46, 0.12);
+    }
 }
 
 .project-window-bar {
@@ -1233,10 +1748,58 @@ main {
 .projects.list-view .project-slide-visual { height: 190px; }
 .projects.list-view .slider-arrows { display: none; }
 
+/* Timeline rail: --rail is scrubbed from 0 to 1 by main.js; it rests full without JS */
 .timeline {
+    --rail: 1;
     margin-top: 2rem;
     display: grid;
     gap: 1rem;
+    position: relative;
+    padding-left: 1.75rem;
+}
+
+.timeline::before,
+.timeline::after {
+    content: "";
+    position: absolute;
+    left: 0.5rem;
+    top: 0.4rem;
+    bottom: 0.4rem;
+    width: 1px;
+    background: var(--line);
+}
+
+.timeline::after {
+    left: calc(0.5rem - 0.5px);
+    width: 2px;
+    background: linear-gradient(to bottom, var(--accent), var(--teal));
+    box-shadow: 0 0 12px rgba(255, 46, 46, 0.45);
+    transform: scaleY(var(--rail));
+    transform-origin: top;
+}
+
+.timeline-entry {
+    position: relative;
+}
+
+.timeline-entry::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    left: calc(-1.75rem + 0.5rem - 5px);
+    top: 1.15rem;
+    width: 11px;
+    height: 11px;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: var(--bg);
+    transition: background-color 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+}
+
+.timeline-entry.is-lit::before {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(255, 46, 46, 0.18), 0 0 14px rgba(255, 46, 46, 0.6);
 }
 
 .timeline-entry {
@@ -1312,6 +1875,33 @@ main {
     width: 90px;
     z-index: 2;
     pointer-events: none;
+    transition: opacity 300ms ease;
+}
+
+/* No fade over the first card before the rail has moved, or over the last one at the end */
+.blog-rail.at-start::before,
+.blog-rail.at-end::after {
+    opacity: 0;
+}
+
+/* Pinned rail can be dragged sideways (mouse or finger); vertical swipes still scroll the page */
+.blog-rail.is-pinned {
+    cursor: grab;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.blog-rail.is-pinned a {
+    -webkit-user-drag: none;
+}
+
+.blog-rail.is-dragging {
+    cursor: grabbing;
+}
+
+body.has-custom-cursor .blog-rail.is-pinned {
+    cursor: none;
 }
 
 .blog-rail::before {
@@ -1333,7 +1923,6 @@ main {
 
 .blog-card {
     width: clamp(260px, 30vw, 350px);
-    min-height: 330px;
     border: 1px solid var(--line);
     background:
         linear-gradient(145deg, rgba(255, 46, 46, 0.08), transparent 42%),
@@ -1346,7 +1935,7 @@ main {
     transform-origin: center;
     position: relative;
     overflow: hidden;
-    transition: transform 260ms ease, border-color 260ms ease, box-shadow 260ms ease;
+    transition: translate 260ms ease, rotate 260ms ease, border-color 260ms ease, box-shadow 260ms ease;
 }
 
 .blog-card::before {
@@ -1355,27 +1944,49 @@ main {
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--accent), transparent 64%);
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--teal) 70%, transparent);
+    /* Sweeps in on hover (always shown on touch screens, which can't hover) */
+    transform: scaleX(0.18);
+    transform-origin: left;
+    transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.blog-card::after {
-    content: "LOG";
-    position: absolute;
-    right: 0.8rem;
-    bottom: 0.65rem;
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 3rem;
+@media (hover: none) {
+    .blog-card::before {
+        transform: scaleX(1);
+    }
+}
+
+/* Big outlined file number */
+.blog-num {
+    margin: 0 0 0.2rem;
+    font-family: "Space Grotesk", sans-serif;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    color: rgba(255, 255, 255, 0.035);
-    pointer-events: none;
+    font-size: clamp(3rem, 5vw, 4.2rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+    color: color-mix(in srgb, var(--text-dim) 22%, transparent);
+    -webkit-text-stroke: 1px color-mix(in srgb, var(--accent) 65%, transparent);
+    transition: color 350ms ease;
 }
 
-.blog-card:hover {
-    transform: translateY(-8px) rotate(-0.6deg);
-    border-color: var(--line-strong);
-    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.58), 0 0 30px rgba(255, 46, 46, 0.1);
+@media (hover: hover) {
+    .blog-card:hover {
+        translate: 0 -8px;
+        rotate: -0.6deg;
+        border-color: var(--line-strong);
+        box-shadow: 0 30px 70px rgba(0, 0, 0, 0.58), 0 0 30px rgba(255, 46, 46, 0.1);
+    }
+
+    .blog-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .blog-card:hover .blog-num {
+        color: color-mix(in srgb, var(--accent) 24%, transparent);
+    }
 }
 
 .blog-card-top {
@@ -1394,7 +2005,7 @@ main {
 }
 
 .blog-related {
-    max-width: 150px;
+    max-width: 65%;
     border: 1px solid rgba(108, 238, 255, 0.35);
     color: var(--teal);
     padding: 0.24rem 0.38rem;
@@ -1472,9 +2083,58 @@ main {
     transform: translateY(24px);
 }
 
+/* Section headings: a redaction bar sweeps across and leaves the text behind.
+   main.js adds .redact-armed only when it will also trigger .is-redacted. */
+.redact-armed {
+    position: relative;
+    width: fit-content;
+    -webkit-text-fill-color: transparent;
+}
+
+.redact-armed::after {
+    content: "";
+    position: absolute;
+    inset: 0.06em -0.12em;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    pointer-events: none;
+}
+
+.redact-armed.is-redacted {
+    animation: redactText 1s linear both;
+}
+
+.redact-armed.is-redacted::after {
+    animation: redactBar 1s cubic-bezier(0.77, 0, 0.18, 1) both;
+}
+
+@keyframes redactText {
+    0%, 49.9% { -webkit-text-fill-color: transparent; }
+    50%, 100% { -webkit-text-fill-color: currentColor; }
+}
+
+@keyframes redactBar {
+    0% { transform: scaleX(0); transform-origin: left; }
+    45% { transform: scaleX(1); transform-origin: left; }
+    55% { transform: scaleX(1); transform-origin: right; }
+    100% { transform: scaleX(0); transform-origin: right; }
+}
+
 @media (max-width: 1080px) {
     .floating-card {
         display: none;
+    }
+
+    /* Too narrow for the logs panel beside the tagline */
+    .system-logs,
+    .hero-cta-row .track-toggle {
+        display: none;
+    }
+
+    .page-spotlight {
+        --spot-r: 150px;
+        --spot-fade: 620px;
     }
 
     .profile-grid {
@@ -1498,7 +2158,8 @@ main {
     }
 }
 
-@media (max-width: 900px) {
+/* Mobile. Keep this query in sync with `mobileQuery` in main.js (the second part covers phones in landscape) */
+@media (max-width: 900px), (pointer: coarse) and (max-height: 500px) {
     .corner-readout,
     .section-status {
         display: none;
@@ -1508,24 +2169,56 @@ main {
         right: 0.24rem;
     }
 
+    /* Two rows: brand + theme toggle on top, full-width swipeable links below */
     .top-nav {
-        position: sticky;
-        top: 0.65rem;
-        border-radius: 0.8rem;
-        width: calc(100vw - 1rem);
+        top: 0.5rem;
         left: 0.5rem;
         right: 0.5rem;
-        transform: none;
-        padding-inline: 0.8rem;
+        width: auto;
+        margin: 0;
+        border-radius: 0.8rem;
+        flex-wrap: wrap;
+        row-gap: 0.35rem;
+        padding: 0.5rem 0.6rem 0.4rem 0.9rem;
     }
 
     .top-nav nav {
+        order: 3;
+        flex: 1 0 100%;
         overflow-x: auto;
-        max-width: 60vw;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .top-nav nav::-webkit-scrollbar { display: none; }
+
+    .top-nav ul {
+        gap: 1.1rem;
+        padding: 0.2rem 0 0.4rem;
+    }
+
+    .nav-link {
+        font-size: 0.86rem;
+        white-space: nowrap;
+    }
+
+    .theme-toggle {
+        padding: 0.4rem 0.65rem;
+    }
+
+    .section-anchor {
+        scroll-margin-top: 104px;
     }
 
     .hero {
-        padding-top: 130px;
+        padding-top: 128px;
+    }
+
+    /* Softer shadow on phones: the light rests where you read, the edges stay legible */
+    .page-spotlight {
+        --spot-r: 170px;
+        --spot-fade: 560px;
+        --spot-dim: 62%;
     }
 
     .project-slider-wrap {
@@ -1561,27 +2254,47 @@ main {
         max-width: 88%;
     }
 
-    .project-stats {
-        grid-template-columns: 1fr;
-    }
-
     .profile-grid {
         grid-template-columns: 1fr;
     }
 
+    .subject-head {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.6rem;
+    }
+
+    .subject-case {
+        text-align: left;
+    }
+
+    /* No pinned scrub on mobile: the rail becomes a native swipe scroller like the project slider */
     .blog-rail {
         margin-inline: -0.4rem;
         padding-inline: 0.4rem;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
     }
 
-    .blog-card {
-        width: min(78vw, 330px);
-        min-height: 360px;
+    .blog-rail::-webkit-scrollbar { display: none; }
+
+    /* When main.js pins the rail (it fits on screen), scroll drives it instead of swipe */
+    .blog-rail.is-pinned {
+        overflow: hidden;
+        scroll-snap-type: none;
     }
 
     .blog-rail::before,
     .blog-rail::after {
-        width: 36px;
+        display: none;
+    }
+
+    .blog-card {
+        width: min(78vw, 330px);
+        scroll-snap-align: start;
     }
 
     .blog-card-top {
@@ -1593,10 +2306,8 @@ main {
         text-align: left;
     }
 
-    .subject-meta-grid,
-    .subject-lang-grid,
-    .inventory-tags {
-        grid-template-columns: 1fr;
+    .inventory-tags span {
+        font-size: 0.78rem;
     }
 
     .subject-availability-meta {
@@ -1618,7 +2329,8 @@ main {
 
     .corner-brackets { display: none; }
     .system-logs { display: none; }
-    .track-toggle { display: none; }
+    /* Extra specificity: the base .track-toggle rule comes later in the file and would win */
+    .hero-cta-row .track-toggle { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1801,11 +2513,14 @@ html.reduced-motion .corner-readout {
 }
 
 /* ─── System Logs ─────────────────────────────────────────────────────── */
+/* Takes the BUILD MODE card's spot (that card wipes away while tracking), clear of the
+   tagline; sits above the hero spotlight's shadow */
 .system-logs {
     position: absolute;
+    z-index: 6;
     right: 0;
-    top: 360px;
-    width: min(320px, 30vw);
+    top: 545px;
+    width: 240px;
     border: 1px solid var(--line);
     background: color-mix(in srgb, var(--panel-hard) 92%, transparent);
     backdrop-filter: blur(8px);
@@ -1818,8 +2533,26 @@ html.reduced-motion .corner-readout {
     transform: translateX(20px);
     transition: opacity 400ms ease, transform 400ms ease;
     pointer-events: none;
-    max-height: 260px;
+    max-height: 215px;
     overflow: hidden;
+}
+
+/* One row per line, so the newest line at the bottom never gets clipped */
+.system-logs-body .log-line {
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* BUILD MODE card wipes up out of the way while tracking (clip-path, since GSAP owns its opacity) */
+.floating-card-c {
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 450ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.hero.is-tracking .floating-card-c {
+    clip-path: inset(0 0 100% 0);
 }
 
 .system-logs.is-visible {
