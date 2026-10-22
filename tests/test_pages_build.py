@@ -29,6 +29,12 @@ class PagesBuildTests(unittest.TestCase):
         html = (OUTPUT / "index.html").read_text(encoding="utf-8")
         self.assertNotIn('href="/resume"', html)
 
+    def test_custom_domain_file_exists(self) -> None:
+        self.assertEqual(
+            (OUTPUT / "CNAME").read_text(encoding="utf-8").strip(),
+            "www.suryaa.app",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

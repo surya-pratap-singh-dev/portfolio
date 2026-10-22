@@ -28,6 +28,7 @@ GitHub Actions builds and verifies each pull request targeting `main`. When chan
 3. Push to `main`, or run the **Deploy to GitHub Pages** workflow manually from the **Actions** tab while selecting the `main` branch.
 
 The project site URL is `https://surya-pratap-singh-dev.github.io/portfolio/`.
+The configured custom domain is `https://www.suryaa.app/`.
 
 ## What is included
 

@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parent
 OUTPUT = ROOT / "dist"
 RESUME_SOURCE = ROOT / "app" / "static" / "Surya_Backend_Engineer (13) (16).pdf"
 RESUME_NAME = "Surya_Pratap_Singh_Resume.pdf"
+CUSTOM_DOMAIN = "www.suryaa.app"
 
 
 def main() -> None:
@@ -17,6 +18,7 @@ def main() -> None:
         rmtree(OUTPUT)
     copytree(ROOT / "app" / "static", OUTPUT / "static", dirs_exist_ok=True)
     copy2(RESUME_SOURCE, OUTPUT / "static" / RESUME_NAME)
+    (OUTPUT / "CNAME").write_text(f"{CUSTOM_DOMAIN}\n", encoding="utf-8")
 
     context = get_home_context()
     context["owner"] = {**context["owner"], "resume_url": f"static/{RESUME_NAME}"}

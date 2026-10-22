@@ -16,6 +16,16 @@ Before the first deployment, set the repository's **Settings → Pages → Build
 
 The expected site address is <https://surya-pratap-singh-dev.github.io/portfolio/>.
 
+## Custom domain
+
+The static build writes `www.suryaa.app` to the Pages `CNAME` file. In Namecheap, open **Domain List → Manage → Advanced DNS** for `suryaa.app` and add:
+
+| Type | Host | Value | TTL |
+| --- | --- | --- | --- |
+| CNAME Record | `www` | `surya-pratap-singh-dev.github.io` | Automatic |
+
+Remove any conflicting `www` record first. Then open the repository's **Settings → Pages**, enter `www.suryaa.app` under **Custom domain**, and save. GitHub will issue the HTTPS certificate after DNS has propagated; then enable **Enforce HTTPS**.
+
 ## Updating the portfolio
 
 - Edit text and portfolio data in `app/main.py`.
