@@ -268,9 +268,14 @@ async def download_resume():
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request) -> HTMLResponse:
+    context = get_home_context()
+    context["request"] = request
+    return templates.TemplateResponse("index.html", context)
+
+
+def get_home_context() -> dict:
     hard_skills = [item["name"] for group in SKILL_GROUPS for item in group["items"]]
-    context = {
-        "request": request,
+    return {
         "owner": OWNER,
         "projects": PROJECTS,
         "skill_groups": SKILL_GROUPS,
@@ -282,4 +287,3 @@ async def home(request: Request) -> HTMLResponse:
         "profile_hard_skills": hard_skills[:12],
         "year": datetime.now().year,
     }
-    return templates.TemplateResponse("index.html", context)

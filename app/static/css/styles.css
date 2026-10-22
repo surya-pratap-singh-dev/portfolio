@@ -2126,8 +2126,9 @@ body.has-custom-cursor .blog-rail.is-pinned {
         display: none;
     }
 
-    /* Too narrow for the logs panel beside the tagline */
+    /* Too narrow for the logs panel and radar beside the tagline */
     .system-logs,
+    .track-radar,
     .hero-cta-row .track-toggle {
         display: none;
     }
@@ -2545,14 +2546,242 @@ html.reduced-motion .corner-readout {
     text-overflow: ellipsis;
 }
 
-/* BUILD MODE card wipes up out of the way while tracking (clip-path, since GSAP owns its opacity) */
+/* BUILD MODE and LAT/LON cards wipe up out of the way while tracking (clip-path, since GSAP
+   owns their opacity): the logs and the radar take their spots */
+.floating-card-a,
 .floating-card-c {
     clip-path: inset(0 0 0 0);
     transition: clip-path 450ms cubic-bezier(0.65, 0, 0.35, 1);
 }
 
+.hero.is-tracking .floating-card-a,
 .hero.is-tracking .floating-card-c {
     clip-path: inset(0 0 100% 0);
+}
+
+/* ─── Tracking radar ──────────────────────────────────────────────────────
+   Sits where the LAT/LON card was. A beam sweeps every --sweep; the server blip flashes as
+   the beam passes its bearing (main.js sets --angle and the matching --delay). */
+.track-radar {
+    --sweep: 4s;
+    position: absolute;
+    right: 10%;
+    top: 150px;
+    z-index: 6;
+    width: 240px;
+    padding: 0.7rem 0.75rem 0.75rem;
+    border: 1px solid var(--line-strong);
+    background: color-mix(in srgb, var(--panel-hard) 92%, transparent);
+    backdrop-filter: blur(8px);
+    box-shadow: var(--shadow), 0 0 30px rgba(255, 46, 46, 0.08);
+    font-family: "IBM Plex Mono", monospace;
+    visibility: hidden;
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    transition:
+        clip-path 600ms cubic-bezier(0.65, 0, 0.35, 1),
+        opacity 300ms ease,
+        visibility 0s linear 600ms;
+}
+
+.hero.is-tracking .track-radar {
+    visibility: visible;
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transition:
+        clip-path 600ms cubic-bezier(0.65, 0, 0.35, 1) 150ms,
+        opacity 300ms ease 150ms,
+        visibility 0s;
+}
+
+.track-radar-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.45rem;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    color: var(--accent-soft);
+}
+
+.track-radar-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--text-dim);
+}
+
+.track-radar-live::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--accent);
+    animation: blink 1s step-end infinite;
+}
+
+.track-radar-scope {
+    position: relative;
+    width: 150px;
+    aspect-ratio: 1;
+    max-width: 100%;
+    margin: 0.6rem auto 0.55rem;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    overflow: hidden;
+    background:
+        radial-gradient(circle, transparent 0 32%, rgba(255, 46, 46, 0.22) 32.5% 33.2%, transparent 33.7% 65.6%, rgba(255, 46, 46, 0.22) 66% 66.7%, transparent 67.2%),
+        linear-gradient(to right, transparent calc(50% - 0.5px), var(--line) calc(50% - 0.5px) calc(50% + 0.5px), transparent calc(50% + 0.5px)),
+        linear-gradient(to bottom, transparent calc(50% - 0.5px), var(--line) calc(50% - 0.5px) calc(50% + 0.5px), transparent calc(50% + 0.5px)),
+        radial-gradient(circle, rgba(255, 46, 46, 0.1), transparent 72%),
+        color-mix(in srgb, var(--panel-hard) 96%, black);
+}
+
+/* Beam: bright leading edge pointing up, fading tail behind it; rotates clockwise from north */
+.radar-sweep {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, transparent 0deg 285deg, rgba(255, 46, 46, 0.06) 300deg, rgba(255, 46, 46, 0.42) 359deg, transparent 360deg);
+    animation: radarSweep var(--sweep) linear infinite;
+}
+
+.radar-sweep::after {
+    content: "";
+    position: absolute;
+    left: calc(50% - 0.5px);
+    top: 0;
+    width: 1px;
+    height: 50%;
+    background: linear-gradient(to top, transparent, var(--accent));
+}
+
+@keyframes radarSweep {
+    to { transform: rotate(360deg); }
+}
+
+.radar-blip {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    margin: -3.5px 0 0 -3.5px;
+    border-radius: 999px;
+}
+
+/* You, at the centre: a steady dot with a ping ring */
+.radar-blip-subject {
+    z-index: 2;
+    background: var(--accent);
+    box-shadow: 0 0 10px rgba(255, 46, 46, 0.8);
+}
+
+.radar-blip-subject::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    border: 1px solid var(--accent);
+    animation: radarPing 2s ease-out infinite;
+}
+
+@keyframes radarPing {
+    from { transform: scale(0.6); opacity: 1; }
+    to { transform: scale(3.4); opacity: 0; }
+}
+
+/* The server, at its real bearing from you; flashes as the beam crosses it */
+.radar-blip-server {
+    --angle: 222deg;
+    --delay: -1.53s;
+    width: 6px;
+    height: 6px;
+    margin: -3px 0 0 -3px;
+    background: var(--teal);
+    transform: rotate(var(--angle)) translateY(-52px) rotate(calc(-1 * var(--angle)));
+    animation: radarBlip var(--sweep) linear infinite;
+    animation-delay: var(--delay);
+}
+
+.radar-blip-server::after {
+    content: attr(data-label);
+    position: absolute;
+    left: 9px;
+    top: -4px;
+    font-size: 0.48rem;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    color: var(--teal);
+}
+
+/* Only the dot flashes (colour + glow), so its label stays readable */
+@keyframes radarBlip {
+    0% { background: var(--teal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--teal) 25%, transparent), 0 0 14px var(--teal); }
+    55%, 100% { background: color-mix(in srgb, var(--teal) 35%, transparent); box-shadow: none; }
+}
+
+.radar-subject-label {
+    position: absolute;
+    left: 50%;
+    top: calc(50% + 8px);
+    translate: -50% 0;
+    font-size: 0.5rem;
+    letter-spacing: 0.12em;
+    color: var(--text-soft);
+}
+
+.radar-north {
+    position: absolute;
+    left: 50%;
+    top: 3px;
+    translate: -50% 0;
+    font-size: 0.48rem;
+    color: var(--text-dim);
+}
+
+.track-radar-data {
+    margin: 0;
+    display: grid;
+    gap: 0.22rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.04em;
+}
+
+.track-radar-data div {
+    display: grid;
+    grid-template-columns: 3.3rem minmax(0, 1fr);
+    gap: 0.4rem;
+}
+
+.track-radar-data dt {
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+}
+
+.track-radar-data dd {
+    margin: 0;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-variant-numeric: tabular-nums;
+}
+
+.track-radar-data [data-radar-status] {
+    color: var(--lime);
+}
+
+.track-radar-data [data-radar-status].is-scanning {
+    color: var(--accent-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .radar-sweep {
+        animation: none;
+        transform: rotate(222deg);
+    }
 }
 
 .system-logs.is-visible {

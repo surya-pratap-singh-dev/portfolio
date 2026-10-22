@@ -643,6 +643,124 @@ window.addEventListener("DOMContentLoaded", () => {
         return chars;
     };
 
+    // ─── Tracking radar (TRACK · ON) ─────────────────────────────────────────
+    // Locks onto the subject: location, coordinates and live local time; the viewer's own
+    // time and the gap between the two (from the browser's time zone, no permission needed);
+    // and the AWS region this site is served from, plotted at its real bearing and distance.
+    const trackRadar = document.querySelector("[data-track-radar]");
+    const heroForRadar = document.getElementById("hero");
+    if (trackRadar && heroForRadar) {
+        const SWEEP_SECONDS = 4; // keep in sync with --sweep in styles.css
+        const SERVER = { lat: 19.076, lon: 72.8777 }; // AWS ap-south-1 (Mumbai), see deploy.yml
+        const lat = parseFloat(trackRadar.dataset.lat);
+        const lon = parseFloat(trackRadar.dataset.lon);
+        const tz = trackRadar.dataset.tz || "Asia/Kolkata";
+
+        // Great-circle distance and initial bearing from the subject to the server
+        const rad = (d) => (d * Math.PI) / 180;
+        const φ1 = rad(lat);
+        const φ2 = rad(SERVER.lat);
+        const Δφ = φ2 - φ1;
+        const Δλ = rad(SERVER.lon - lon);
+        const h = Math.sin(Δφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
+        const km = Math.round(6371 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h)));
+        const bearing = ((Math.atan2(Math.sin(Δλ) * Math.cos(φ2), Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ)) * 180) / Math.PI + 360) % 360;
+        const compass = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"][Math.round(bearing / 45) % 8];
+
+        const serverBlip = trackRadar.querySelector("[data-radar-server]");
+        if (serverBlip) {
+            // The beam starts at north and turns clockwise: it reaches this bearing after
+            // bearing/360 of a turn, so start the blip's flash cycle offset by that much
+            serverBlip.style.setProperty("--angle", `${bearing.toFixed(1)}deg`);
+            serverBlip.style.setProperty("--delay", `${(-(SWEEP_SECONDS - (bearing / 360) * SWEEP_SECONDS)).toFixed(2)}s`);
+        }
+        const serverInfo = trackRadar.querySelector("[data-radar-server-info]");
+        if (serverInfo) serverInfo.textContent = `AP-SOUTH-1 · ${km.toLocaleString("en-IN")} KM ${compass}`;
+
+        // Clocks
+        const timeEl = trackRadar.querySelector("[data-radar-time]");
+        const viewerEl = trackRadar.querySelector("[data-radar-viewer]");
+        const statusEl = trackRadar.querySelector("[data-radar-status]");
+        let subjectClock;
+        try {
+            subjectClock = new Intl.DateTimeFormat("en-GB", { timeZone: tz, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+        } catch (e) {
+            subjectClock = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+        }
+        const zoneName = tz === "Asia/Kolkata" ? "IST" : (() => {
+            try {
+                return new Intl.DateTimeFormat("en-US", { timeZone: tz, timeZoneName: "short" }).formatToParts(new Date()).find((p) => p.type === "timeZoneName")?.value || "";
+            } catch (e) { return ""; }
+        })();
+        const viewerZone = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch (e) { return ""; } })();
+        const viewerClock = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false });
+        const offsetMinutes = (zone) => {
+            try {
+                const now = new Date();
+                const inZone = new Date(now.toLocaleString("en-US", { timeZone: zone }));
+                const inUtc = new Date(now.toLocaleString("en-US", { timeZone: "UTC" }));
+                return Math.round((inZone - inUtc) / 60000);
+            } catch (e) { return 0; }
+        };
+        // Browsers still report a few zones under old names (Chrome: "Asia/Calcutta")
+        const CITY_ALIASES = { CALCUTTA: "KOLKATA", KIEV: "KYIV", SAIGON: "HO CHI MINH" };
+        const rawCity = viewerZone ? viewerZone.split("/").pop().replace(/_/g, " ").toUpperCase() : "LOCAL";
+        const viewerCity = CITY_ALIASES[rawCity] || rawCity;
+        const subjectCity = (trackRadar.querySelector(".radar-subject-label")?.textContent || "SUBJECT").trim();
+
+        const tick = () => {
+            const now = new Date();
+            if (timeEl) timeEl.textContent = `${subjectClock.format(now)} ${zoneName}`.trim();
+            if (viewerEl) {
+                // How far ahead (+) or behind (−) the subject's clock is from the viewer's
+                const gap = offsetMinutes(tz) - (viewerZone ? offsetMinutes(viewerZone) : -now.getTimezoneOffset());
+                const gapText = `Δ${gap > 0 ? "+" : "−"}${Math.floor(Math.abs(gap) / 60)}:${pad(Math.abs(gap) % 60)}`;
+                viewerEl.textContent = gap === 0
+                    ? `${viewerClock.format(now)} · SAME ZONE`
+                    : `${viewerClock.format(now)} ${viewerCity} · ${gapText}`;
+            }
+        };
+
+        // Lock-on sequence each time tracking turns on
+        let clockTimer = null;
+        let lockTimer = null;
+        const startRadar = () => {
+            tick();
+            clearInterval(clockTimer);
+            clockTimer = setInterval(tick, 1000);
+            if (statusEl) {
+                clearTimeout(lockTimer);
+                statusEl.classList.add("is-scanning");
+                statusEl.textContent = "SCANNING…";
+                lockTimer = setTimeout(() => {
+                    statusEl.classList.remove("is-scanning");
+                    statusEl.textContent = `LOCKED · ${subjectCity}`;
+                    scramble(statusEl, 0.5);
+                }, reducedMotion ? 0 : 1500);
+            }
+            trackRadar.querySelectorAll("dd:not([data-radar-status])").forEach((dd) => {
+                delete dd.dataset.text; // clocks change every second; decode their current text
+                scramble(dd, 0.7);
+            });
+        };
+        const stopRadar = () => {
+            clearInterval(clockTimer);
+            clearTimeout(lockTimer);
+            clockTimer = null;
+        };
+
+        // setTrack() flips .is-tracking on the hero (also when restoring a saved "on")
+        let radarOn = false;
+        const syncRadar = () => {
+            const on = heroForRadar.classList.contains("is-tracking");
+            if (on === radarOn) return; // only react when tracking actually flips
+            radarOn = on;
+            if (on) startRadar(); else stopRadar();
+        };
+        new MutationObserver(syncRadar).observe(heroForRadar, { attributes: true, attributeFilter: ["class"] });
+        syncRadar();
+    }
+
     // ─── GSAP Init (after preloader) ─────────────────────────────────────────
     const initAnimations = () => {
         if (!window.gsap || !window.ScrollTrigger || reducedMotion) {
