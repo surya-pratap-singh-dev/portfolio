@@ -18,7 +18,7 @@ The expected site address is <https://surya-pratap-singh-dev.github.io/portfolio
 
 ## Custom domain
 
-The static build writes `www.suryaa.app` to the Pages `CNAME` file. In Namecheap, open **Domain List → Manage → Advanced DNS** for `suryaa.app` and add:
+The static build writes `www.suryaa.app` to the Pages `CNAME` file. In Name.com, open the domain's **DNS Records** page and add:
 
 | Type | Host | Value | TTL |
 | --- | --- | --- | --- |
