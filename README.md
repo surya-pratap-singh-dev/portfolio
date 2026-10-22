@@ -30,6 +30,17 @@ GitHub Actions builds and verifies each pull request targeting `main`. When chan
 The project site URL is `https://surya-pratap-singh-dev.github.io/portfolio/`.
 The configured custom domain is `https://www.suryaa.app/`.
 
+### Custom domain setup
+
+The domain is registered at Name.com. To point it to GitHub Pages:
+
+1. In Name.com, open `suryaa.app` → **DNS Records**.
+2. Remove the old AWS records pointing to `13.206.194.159`.
+3. Add four root A records: `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, and `185.199.111.153`.
+4. Add a CNAME record with host `www` and value `surya-pratap-singh-dev.github.io`.
+5. In GitHub, open **Settings → Pages**, choose **GitHub Actions**, and set the custom domain to `www.suryaa.app`.
+6. Wait for the DNS check and TLS certificate to complete, then enable **Enforce HTTPS**. This can take up to 24 hours; the browser can be closed while waiting.
+
 ## What is included
 
 - Hero section with animated intro + tagline

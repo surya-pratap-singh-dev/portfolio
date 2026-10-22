@@ -18,13 +18,21 @@ The expected site address is <https://surya-pratap-singh-dev.github.io/portfolio
 
 ## Custom domain
 
-The static build writes `www.suryaa.app` to the Pages `CNAME` file. In Name.com, open the domain's **DNS Records** page and add:
+The static build writes `www.suryaa.app` to the Pages `CNAME` file. In Name.com, open the domain's **DNS Records** page and configure the records below. Delete the old AWS records pointing to `13.206.194.159` first.
 
 | Type | Host | Value | TTL |
 | --- | --- | --- | --- |
-| CNAME Record | `www` | `surya-pratap-singh-dev.github.io` | Automatic |
+| A Record | `@` / blank | `185.199.108.153` | `300` |
+| A Record | `@` / blank | `185.199.109.153` | `300` |
+| A Record | `@` / blank | `185.199.110.153` | `300` |
+| A Record | `@` / blank | `185.199.111.153` | `300` |
+| CNAME Record | `www` | `surya-pratap-singh-dev.github.io` | `300` |
 
-Remove any conflicting `www` record first. Then open the repository's **Settings → Pages**, enter `www.suryaa.app` under **Custom domain**, and save. GitHub will issue the HTTPS certificate after DNS has propagated; then enable **Enforce HTTPS**.
+In Name.com, the root-domain host can appear as `suryaa.app`; for the `www` record, enter only `www` in the host field. Remove any conflicting `www` record, especially an old A record. Do not include `https://` or `/portfolio` in the CNAME value.
+
+Then open the repository's **Settings → Pages**, set **Source** to **GitHub Actions**, enter `www.suryaa.app` under **Custom domain**, and click **Save**. Click **Check again** after DNS changes propagate.
+
+GitHub will show **DNS check successful** and provision a TLS certificate. Certificate provisioning can take 15 minutes to 24 hours. The **Enforce HTTPS** checkbox stays unavailable until the certificate is fully issued; it is safe to close the browser while waiting. Refresh the Pages settings later, enable **Enforce HTTPS**, and verify the site at <https://www.suryaa.app>.
 
 ## Updating the portfolio
 
